@@ -1,11 +1,15 @@
 library(DATRAS)
 
+#############################################################
+## 1. Read the builtin data. Alternatively use 'readICES' or
+##   'readExchange' to read DATRASraw object from a file.
+#############################################################
+
 data(mussel) ## Get data object 'd'
 
-## Note:
-## Alternatively read DATRASraw from file using e.g. readICES og readExchange
-
-## 1. Data pre-processing
+#############################################################
+## 2. Data pre-processing
+#############################################################
 
 ## Remove invalid hauls (I/V)
 d <- subset(d, HaulVal == "V")
@@ -21,4 +25,8 @@ d$sweptArea <- d$Distance * 1.20
 w <- tapply(d[["HL"]]$CatCatchWgt,d[["HL"]]$haul.id,function(x)x[1])
 w[is.na(w)] <- 0
 d[["HH"]]$TotalWeight <- w[as.character(d$haul.id)]
+
+#############################################################
+## 3. Add spatial grid
+#############################################################
 
