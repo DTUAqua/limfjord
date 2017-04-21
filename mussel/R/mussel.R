@@ -1,3 +1,4 @@
+if(FALSE){
 ## Script input:
 ###############
 WEIGHT <- c("total", "commercial")[1]
@@ -202,3 +203,4 @@ names(tab)[3] <- "Estimate"
 
 rm(obj,obj3)
 save.image(file="rapport2016.RData")
+}

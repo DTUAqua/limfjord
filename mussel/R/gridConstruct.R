@@ -1,3 +1,4 @@
+if(FALSE){
 ## Script input: DATRASraw object d
 
 ## Grid
@@ -57,7 +58,9 @@ gridConstruct <- function(d){
     remap <- c("Lovns Bredning, Øst", "Lovns Bredning, Vest")
     levels(fac)[levels(fac) %in% remap] <- "Lovns Bredning"
     spatialRegions <<- fac
+    NULL
 }
+
 
 plotMap <- function(..., add=FALSE){
     if(!add)plot(gr,...)
@@ -80,3 +83,4 @@ area2 <- c("Lovns Bredning")
 levels(spatialRegions2)[!(levels(spatialRegions2) %in% c(area1,area2))] <- NA
 levels(spatialRegions2)[levels(spatialRegions2) %in% area1] <- "Natura Loegstoer"
 levels(spatialRegions2)[levels(spatialRegions2) %in% area2] <- "Lovns Bredning"
+}
