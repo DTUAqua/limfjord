@@ -84,4 +84,10 @@ area2 <- c("Lovns Bredning")
 levels(spatialRegions2)[!(levels(spatialRegions2) %in% c(area1,area2))] <- NA
 levels(spatialRegions2)[levels(spatialRegions2) %in% area1] <- "Natura Loegstoer"
 levels(spatialRegions2)[levels(spatialRegions2) %in% area2] <- "Lovns Bredning"
+
+## Cache default grid, regions etc
+map.pol <- map.pol[8<map.pol[,1] & map.pol[,1]<10 & 56<map.pol[,2] & map.pol[,2]<58  , ]
+save(gr, map.pol, spatialRegions, spatialRegions2, file="data/grid.RData")
+
+
 }
