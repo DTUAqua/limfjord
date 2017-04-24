@@ -36,3 +36,4 @@ data(grid, package="mussel") ## Get default grid
 ## 4. Fit model
 #############################################################
 
+env <- fitModel(d)
