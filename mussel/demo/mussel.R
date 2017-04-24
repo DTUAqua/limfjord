@@ -30,3 +30,5 @@ d[["HH"]]$TotalWeight <- w[as.character(d$haul.id)]
 ## 3. Add spatial grid
 #############################################################
 
+data(grid, package="mussel") ## Get default grid
+

@@ -1,20 +1,21 @@
-if(FALSE){
 ## Script input: DATRASraw object d
 
-## Grid
-library(gridConstruct)
-library(rgdal)
 
 ## Objects to construct
-gr <- NULL
-map.pol <- NULL
-spatialRegions <- NULL
+## gr <- NULL
+## map.pol <- NULL
+## spatialRegions <- NULL
+## spatialRegions2 <- NULL
 
-gridConstruct <- function(d){
-    ## gr <- gridConstruct(d,km=.5)
+## Optionally override:
+gridConstruct <- function(d, km=.5){
+    ## Grid
+    library(gridConstruct)
+    library(rgdal)
+    ## gr <- gridConstruct(d,km=km)
     ## points(d$lon,d$lat)
     ## map("worldHires",add=TRUE)
-    gr <- gridConstruct::gridConstruct(d,km=.5,filter=FALSE)
+    gr <- gridConstruct::gridConstruct(d,km=km,filter=FALSE)
     ## Read shape file data
     ## Depth data:
     ##  shape <- readOGR("../shpfiles/","Bathy_Lim_1m_ploy")
@@ -69,25 +70,24 @@ plotMap <- function(..., add=FALSE){
     polygon(map.pol[,1],map.pol[,2],col="grey")
 }
 
-gridConstruct(d)
-
-
-## New spatial region that approximate natura 2000 areas:
-spatialRegions2 <- spatialRegions
-area1 <- c("Bjørnsholm Bugt",
-           "Løgstør Bredning",
-           "Løgstør Bredning, Øst",
-           "Løgstør Bredning, Vest",
-           "Løgstør Grunde",
-           "Livø Bredning, Øst")
-area2 <- c("Lovns Bredning")
-levels(spatialRegions2)[!(levels(spatialRegions2) %in% c(area1,area2))] <- NA
-levels(spatialRegions2)[levels(spatialRegions2) %in% area1] <- "Natura Loegstoer"
-levels(spatialRegions2)[levels(spatialRegions2) %in% area2] <- "Lovns Bredning"
-
-## Cache default grid, regions etc
-map.pol <- map.pol[8<map.pol[,1] & map.pol[,1]<10 & 56<map.pol[,2] & map.pol[,2]<58  , ]
-save(gr, map.pol, spatialRegions, spatialRegions2, file="data/grid.RData")
-
-
+if(FALSE){ ## Create cache
+    gridConstruct(d)
+    ## New spatial region that approximate natura 2000 areas:
+    spatialRegions2 <- spatialRegions
+    area1 <- c("Bjørnsholm Bugt",
+               "Løgstør Bredning",
+               "Løgstør Bredning, Øst",
+               "Løgstør Bredning, Vest",
+               "Løgstør Grunde",
+               "Livø Bredning, Øst")
+    area2 <- c("Lovns Bredning")
+    levels(spatialRegions2)[!(levels(spatialRegions2) %in% c(area1,area2))] <- NA
+    levels(spatialRegions2)[levels(spatialRegions2) %in% area1] <- "Natura Loegstoer"
+    levels(spatialRegions2)[levels(spatialRegions2) %in% area2] <- "Lovns Bredning"
+    
+    ## Cache default grid, regions etc
+    map.pol <- map.pol[8<map.pol[,1] & map.pol[,1]<10 & 56<map.pol[,2] & map.pol[,2]<58  , ]
+    save(gr, map.pol, spatialRegions, spatialRegions2, file="data/grid.RData")
 }
+
+
