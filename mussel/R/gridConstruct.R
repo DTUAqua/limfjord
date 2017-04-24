@@ -18,7 +18,8 @@ gridConstruct <- function(d){
     ## Read shape file data
     ## Depth data:
     ##  shape <- readOGR("../shpfiles/","Bathy_Lim_1m_ploy")
-    shape <- readOGR("../shpfiles/Denmark","Kystlinie")
+    file <- system.file("shp/Denmark",package="mussel")
+    shape <- readOGR(file,"Kystlinie")
     proj4 <- proj4string(shape)
     map <- spTransform(shape,CRS("+proj=longlat"))
     gr2 <- as.data.frame(gr)
@@ -46,8 +47,8 @@ gridConstruct <- function(d){
     gr <<- gr3
     map.pol <<- qw
     ## Additional regions
-
-    shape <- readOGR("../shpfiles/Regions","Limfjord_omraader_nov_2005_area")
+    file <- system.file("shp/Regions",package="mussel")
+    shape <- readOGR(file,"Limfjord_omraader_nov_2005_area")
     proj4 <- proj4string(shape)
     regions <- spTransform(shape,CRS("+proj=longlat"))
     gr2 <- as.data.frame(gr3)
