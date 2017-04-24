@@ -8,3 +8,4 @@ Maintainer: Kasper Kristensen <kaskr@dtu.dk>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
 LinkingTo: TMB, RcppEigen
+Depends: gridConstruct, DATRAS
