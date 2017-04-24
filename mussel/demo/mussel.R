@@ -24,11 +24,15 @@ d$sweptArea <- d$Distance * 1.20
 ## Add response variable: Total weight (g)
 w <- tapply(d[["HL"]]$CatCatchWgt,d[["HL"]]$haul.id,function(x)x[1])
 w[is.na(w)] <- 0
-d[["HH"]]$TotalWeight <- w[as.character(d$haul.id)]
+d[["HH"]]$Weight <- w[as.character(d$haul.id)]
 
 #############################################################
 ## 3. Add spatial grid
 #############################################################
 
 data(grid, package="mussel") ## Get default grid
+
+#############################################################
+## 4. Fit model
+#############################################################
 
