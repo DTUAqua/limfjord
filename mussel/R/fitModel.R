@@ -78,7 +78,7 @@ map3 <- list()
 map3$logscale <- factor(col(parameters$logscale))
 map3$logsd_nugget<- factor(parameters$logsd_nugget* 0)
 obj3 <- MakeADFun(data=data,
-                  parameters=pl,
+                  parameters=parameters,
                   random=c("^eta"),
                   profile="mu",
                   regexp=TRUE,
