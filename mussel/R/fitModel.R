@@ -29,7 +29,7 @@ d[[2]]$time <- time
 ## Sparse matrices for GMRF: Q = Q0+delta*I
 Q0 <- -attr(gr,"pattern")
 diag(Q0) <- 0
-diag(Q0) <- -rowSums(Q0)
+diag(Q0) <- -Matrix::rowSums(Q0)
 I <- .symDiagonal(nrow(Q0))
 
 ## Data
