@@ -120,7 +120,7 @@ mypretty <- function(br, tol=1){
         length=length(br))
 }
 
-plotMap <- function(env,time="2016",...){
+plotMaps <- function(env,time="2016",...){
     env$showTime <- time
     local({
         layout(matrix(1:4,2))
