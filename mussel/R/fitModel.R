@@ -44,7 +44,7 @@ data <- list(
     spatialRegions = spatialRegions,
     sweptArea = d[[2]]$sweptArea,
     gridCellArea = gridCellArea,
-    reportLog = 1
+    reportLog = 0 ## Natural scale (faster)
 )
 
 ## Parameters
@@ -90,15 +90,16 @@ system.time(opt3 <- nlminb(obj3$par,obj3$fn,obj3$gr))
 hessian <- optimHess(opt3$par, obj3$fn, obj3$gr)
 eigen(hessian)$val
 
+pl <- obj3$env$parList(par=obj3$env$last.par.best)
+rep <- obj3$report(obj3$env$last.par.best)
+system.time( sdrep0 <- sdreport(obj3, hessian = hessian, bias.correct=TRUE) )
+
 if(getLog){
+    obj3$env$data$reportLog <- 1 ## Log scale report
     system.time( sdrep <- sdreport(obj3, hessian = hessian, bias.correct=TRUE,
                                    getReportCovariance=FALSE,
                                    bias.correct.control=list(sd=FALSE, nsplit=10) ) ) ## <--- very memory intensive when reportLog = TRUE
 }
-pl <- obj3$env$parList(par=obj3$env$last.par.best)
-rep <- obj3$report(obj3$env$last.par.best)
-obj3$env$data$reportLog <- 0 ## Natural scale report
-system.time( sdrep0 <- sdreport(obj3, hessian = hessian, bias.correct=TRUE) )
 
 environment()
 }
