@@ -42,6 +42,8 @@ env <- fitModel(d)
 ## 5. Plot results
 #############################################################
 
-plotMaps(env)
+layout(matrix(1:4,2))
+plotMaps(env) ## 4 maps
 
+layout(1)
 plotTimeSeries(env)

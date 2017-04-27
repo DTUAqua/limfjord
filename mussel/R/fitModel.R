@@ -124,7 +124,6 @@ mypretty <- function(br, tol=1){
 plotMaps <- function(env,time="2016",...){
     env$showTime <- time
     local({
-        layout(matrix(1:4,2))
 ##################### Plot results
         y <- which(levels(data$time)==showTime)
         presence.prob <- 1/(1+exp(-pl$eta_presence[,y]))
@@ -211,6 +210,7 @@ plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),...) {
         ylab <- expression(`b  `(kg/m^2))
         mtext(ylab,2,line=2.5)
         mtext(xlab,1,line=2.5)
+        title(selectRegions)
         ##points(as.numeric(names(b)),b)
     }, env)
 }
