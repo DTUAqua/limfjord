@@ -1,4 +1,4 @@
-fitModel <- function(d, getLog=FALSE) {
+fitModel <- function(d, getLogIndex=FALSE, getIndex=TRUE) {
 
 ## Attach grid cell to each haulid:
 d[[2]]$gf <- gridFactor(d,gr)
@@ -92,9 +92,12 @@ eigen(hessian)$val
 
 pl <- obj3$env$parList(par=obj3$env$last.par.best)
 rep <- obj3$report(obj3$env$last.par.best)
-system.time( sdrep0 <- sdreport(obj3, hessian = hessian, bias.correct=TRUE) )
 
-if(getLog){
+if(getIndex){
+    system.time( sdrep0 <- sdreport(obj3, hessian = hessian, bias.correct=TRUE) )
+}
+
+if(getLogIndex){
     obj3$env$data$reportLog <- 1 ## Log scale report
     system.time( sdrep <- sdreport(obj3, hessian = hessian, bias.correct=TRUE,
                                    getReportCovariance=FALSE,
