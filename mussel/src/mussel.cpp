@@ -60,6 +60,10 @@ Type objective_function<Type>::operator() ()
       SIMULATE {
         response[i] = exp( rnorm(mu_i, sd_i) );
       }
+    } else {
+      SIMULATE {
+        response[i] = 0;
+      }
     }
   }
 
