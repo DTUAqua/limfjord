@@ -47,3 +47,6 @@ plotMaps(env) ## 4 maps
 
 layout(1)
 plotTimeSeries(env)
+
+layout(1)
+plotBiomassMap(env)
