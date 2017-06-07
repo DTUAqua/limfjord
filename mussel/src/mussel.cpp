@@ -12,6 +12,7 @@ Type objective_function<Type>::operator() ()
   DATA_VECTOR(sweptArea);      // by haul
   DATA_FACTOR(spatialRegions); // by grid index
   //DATA_SCALAR(gridCellArea);   // km^2
+  DATA_VECTOR(yearLevels);     // as.numeric(levels(Year))
   DATA_INTEGER(reportLog);
   /* Random fields */
   PARAMETER_ARRAY(eta_presence);
@@ -92,7 +93,13 @@ Type objective_function<Type>::operator() ()
     for(int j=0; j < NLEVELS(time); j++){
       C = exp(eta_density(i,j) + log(1.0/(1.0+exp(-eta_presence(i,j)))) + mu(j));
       C = C / 1000.0; // Kg
-      b(spatialRegions(i), j) += 2.703 * pow(C/A, 0.29);
+      if (yearLevels(j) < 2017 ) {
+        // Old Gear (until 2016)
+        b(spatialRegions(i), j) += 2.703 * pow(C/A, 0.29);
+      } else {
+        // New Gear (from 2017)
+        b(spatialRegions(i), j) += 2.470 * C/A;
+      }
       cellcount(spatialRegions(i), j) = cellcount(spatialRegions(i), j) + 1.0;
     }
   }

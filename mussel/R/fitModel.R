@@ -44,6 +44,7 @@ data <- list(
     spatialRegions = spatialRegions,
     sweptArea = d[[2]]$sweptArea,
     gridCellArea = gridCellArea,
+    yearLevels = as.numeric(levels(d$Year)),
     reportLog = 0 ## Natural scale (faster)
 )
 
