@@ -217,7 +217,7 @@ plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),...) {
         est <- sdrep0$unbiased$value
         sd <- summary(sdrep0,"report")[,2]
         ind <- (rbind(matrix(1:length(est),nlevels(spatialRegions),nlevels(time))))
-        mat <- cbind(est,est-1.96*sd,est+1.96*sd)
+        mat <- cbind(Estimate=est,Lower=est-1.96*sd,Upper=est+1.96*sd)
         k <- match(selectRegions, levels(spatialRegions))
         newmat <- mat[ind[k,],]
         rownames(newmat) <- levels(time)
@@ -229,6 +229,7 @@ plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),...) {
         mtext(xlab,1,line=2.5)
         title(selectRegions)
         ##points(as.numeric(names(b)),b)
+        newmat
     }, env)
 }
 
