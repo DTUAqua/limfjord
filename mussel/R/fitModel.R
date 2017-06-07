@@ -1,4 +1,4 @@
-fitModel <- function(d, getLogIndex=FALSE, getIndex=TRUE) {
+fitModel <- function(d, getLogIndex=FALSE, getIndex=TRUE, getLogB=TRUE) {
 
 ## Attach grid cell to each haulid:
 d[[2]]$gf <- gridFactor(d,gr)
@@ -90,8 +90,9 @@ system.time(opt3 <- nlminb(obj3$par,obj3$fn,obj3$gr,control=list(trace=1)))
 hessian <- optimHess(opt3$par, obj3$fn, obj3$gr)
 eigen(hessian)$val
 
-pl <- obj3$env$parList(par=obj3$env$last.par.best)
-rep <- obj3$report(obj3$env$last.par.best)
+lpb <- obj3$env$last.par.best
+pl <- obj3$env$parList(par=lpb)
+rep <- obj3$report(lpb)
 
 if(getIndex){
     system.time( sdrep0 <- sdreport(obj3, hessian = hessian, bias.correct=TRUE) )
@@ -102,6 +103,21 @@ if(getLogIndex){
     system.time( sdrep <- sdreport(obj3, hessian = hessian, bias.correct=TRUE,
                                    getReportCovariance=FALSE,
                                    bias.correct.control=list(sd=FALSE, nsplit=10) ) ) ## <--- very memory intensive when reportLog = TRUE
+}
+
+if(getLogB) {
+    obj3$env$par <- lpb
+    ## Let each grid point be a 'spatial region'
+    obj3$env$data$spatialRegions <-
+        unclass(factor(seq_len(nrow(gr))))-1
+    storage.mode(obj3$env$data$spatialRegions) <- "double"
+    obj3$env$data$reportLog <- 1
+    ##obj3$retape()
+    local( {
+        Fun <- .Call("MakeDoubleFunObject", data, parameters, reportenv, PACKAGE = DLL)
+    },
+    obj3$env)
+    logB <- obj3$report(lpb)$logb
 }
 
 environment()
