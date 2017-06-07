@@ -96,7 +96,25 @@ pl <- obj3$env$parList(par=lpb)
 rep <- obj3$report(lpb)
 
 if(getIndex){
+    cat("Calc index spatialRegions\n")
     system.time( sdrep0 <- sdreport(obj3, hessian = hessian, bias.correct=TRUE) )
+
+    cat("Calc index spatialRegions2\n")
+    levels(spatialRegions2) <- c(levels(spatialRegions2), "NA")
+    spatialRegions2[is.na(spatialRegions2)] <- "NA"
+    data$spatialRegions <- spatialRegions2
+    obj3 <- MakeADFun(data=data,
+                      parameters=pl,
+                      random=c("^eta"),
+                      profile="mu",
+                      regexp=TRUE,
+                      DLL="mussel",
+                      map=map3
+                      )
+    obj3$fn(opt3$par)
+    obj3$env$data$reportLog <- 0 ## Natural scale report
+    system.time( sdrep00 <- sdreport(obj3, hessian = hessian, bias.correct=TRUE) )
+
 }
 
 if(getLogIndex){
@@ -233,3 +251,4 @@ plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),...) {
     }, env)
 }
 
+plotTimeSeries2 <- eval(parse(text=gsub("sdrep0","sdrep00",gsub("spatialRegions","spatialRegions2",deparse(plotTimeSeries)))))
