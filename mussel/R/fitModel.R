@@ -171,10 +171,7 @@ plotMaps <- function(env,time="2016",...){
         box()
 ########################
 ## Map of biomass-density
-## b = 2.703 * ((C/A)/1000)^0.29
-        logC <- pl$eta_density[,y] + log(1/(1+exp(-pl$eta_presence[,y]))) + pl$mu[y]
-        A <- mean(d$sweptArea)
-        logb <- log(  2.703 * ((exp(logC)/A)/1000)^0.29  )
+        logb <- logB[,y]
         resp <- logb
         plot(gr,type="n",las=1,xlab="Longitude",ylab="Latitude", main="Biomass-density")
         br <- seq(min(resp),max(resp), length=17)
