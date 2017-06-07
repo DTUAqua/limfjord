@@ -25,6 +25,10 @@ w <- tapply(d[["HL"]]$CatCatchWgt,d[["HL"]]$haul.id,function(x)x[1])
 w[is.na(w)] <- 0
 d[["HH"]]$Weight <- w[as.character(d$haul.id)]
 
+## Standardize response to kg/m^2
+d[["HH"]]$Weight <- d[["HH"]]$Weight / d[["HH"]]$sweptArea
+d$sweptArea[] <- 1
+
 #############################################################
 ## 3. Add spatial grid
 #############################################################
