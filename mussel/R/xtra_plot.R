@@ -4,9 +4,7 @@ plotBiomassMap <- function(env, time="2016", xlim=c(9.15,9.35), ylim=c(56.6,56.7
     env$ylim <- ylim
     local({
         y <- which(levels(data$time)==showTime)
-        logC <- pl$eta_density[,y] + log(1/(1+exp(-pl$eta_presence[,y]))) + pl$mu[y]
-        A <- mean(d$sweptArea)
-        logb <- log(  2.703 * ((exp(logC)/A)/1000)^0.29  )
+        logb <- logB[,y]
         resp <- exp(logb)
         plot(gr,type="n",las=1,xlab="Longitude",ylab="Latitude",xlim=xlim , ylim=ylim)
         subresp <- resp[xlim[1]<gr$lon & gr$lon<xlim[2] & ylim[1]<gr$lat & gr$lat<ylim[2]]
