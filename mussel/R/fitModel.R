@@ -249,7 +249,10 @@ plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),...) {
         ##points(as.numeric(names(b)),b)
         ## FIXME: Make 'km' part of grid object
         km <- summary(as.polygons(gr))$side.length[1,4]
-        A <- km^2 * 1e6
+        ## Number of grid cells in area
+        numCells <- sum(as.character(spatialRegions) == selectRegions, na.rm=TRUE)
+        ## Total area
+        A <- km^2 * 1e6 * numCells
         newmat <- cbind(newmat, newmat * A)
         colnames(newmat)[1] <- "Density (kg/m^2)"
         colnames(newmat)[4] <- "Total (kg)"
