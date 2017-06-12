@@ -6,6 +6,7 @@ plotBiomassMap <- function(env, time="2016", xlim=c(9.15,9.35), ylim=c(56.6,56.7
         y <- which(levels(data$time)==showTime)
         logb <- logB[,y]
         resp <- exp(logb)
+        par(mar = c(5.1, 4.1, 4.1, 2.1 + .5))
         plot(gr,type="n",las=1,xlab="Longitude",ylab="Latitude",xlim=xlim , ylim=ylim)
         subresp <- resp[xlim[1]<gr$lon & gr$lon<xlim[2] & ylim[1]<gr$lat & gr$lat<ylim[2]]
         probs <- seq(0,1,length=26)
