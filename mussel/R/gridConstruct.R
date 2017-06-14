@@ -48,15 +48,41 @@ gridConstruct <- function(d, km=.5){
     gr <<- gr3
     map.pol <<- qw
     ## Additional regions
-    file <- system.file("shp/Regions",package="mussel")
-    shape <- readOGR(file,"Limfjord_omraader_nov_2005_area")
-    proj4 <- proj4string(shape)
-    regions <- spTransform(shape,CRS("+proj=longlat"))
-    gr2 <- as.data.frame(gr3)
-    coordinates(gr2) <- ~lon + lat
-    proj4string(gr2) <- CRS("+proj=longlat")
-    xtra <- over(gr2, regions)
-    fac <- factor(xtra[[2]])
+    ## Alle_muslingeomraader_2011_region
+    ## Forbudsomraader_musling
+    ## Natura2000 = Habitatomraade16_intersect_hav
+    ## Habitatomraade30_Intersect_hav_explode_kun_lovns
+    ## Limfjord_omraader_nov_2005_area
+    lookupRegions <- function(filename = "Limfjord_omraader_nov_2005_area") {
+        folder <- system.file("shp/Regions",package="mussel")
+        shape <- readOGR(folder, filename)
+        proj4 <- proj4string(shape)
+        regions <- spTransform(shape,CRS("+proj=longlat"))
+        gr2 <- as.data.frame(gr3)
+        coordinates(gr2) <- ~lon + lat
+        proj4string(gr2) <- CRS("+proj=longlat")
+        xtra <- over(gr2, regions)
+        fac <- factor(xtra[[2]])
+        fac
+    }
+    ## Test content
+    if(FALSE) {
+        files <- sub("\\..*","",dir(folder, pattern="dbf"))
+        myf <- function(x)levels(lookupRegions(x))
+        out <- lapply(files, myf)
+        names(out) <- files
+    }
+
+    ## Produktionsomraåder løgstør
+    prodomr <- c("Feggesund / Hovsør Havn" = 32,
+                 "Bjørnsholm Bugt" = 37,
+                 "Løgstør Bredning" = 34,
+                 "Løgstør Bredning, Øst" = 38,
+                 "Løgstør Bredning, Vest" = 33,
+                 "Løgstør Grunde" = 39,
+                 "Livø Bredning, Øst" = 36)
+
+    fac <- lookupRegions()
     remap <- c("Lovns Bredning, Øst", "Lovns Bredning, Vest")
     levels(fac)[levels(fac) %in% remap] <- "Lovns Bredning"
     spatialRegions <<- fac
