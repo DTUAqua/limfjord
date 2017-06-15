@@ -53,11 +53,13 @@ gridConstruct <- function(d, km=.5){
     ## Natura2000 = Habitatomraade16_intersect_hav
     ## Habitatomraade30_Intersect_hav_explode_kun_lovns
     ## Limfjord_omraader_nov_2005_area
-    lookupRegions <- function(filename = "Limfjord_omraader_nov_2005_area") {
+    lookupRegions <- function(filename = "Limfjord_omraader_nov_2005_area",
+                              getShape=FALSE) {
         folder <- system.file("shp/Regions",package="mussel")
         shape <- readOGR(folder, filename)
         proj4 <- proj4string(shape)
         regions <- spTransform(shape,CRS("+proj=longlat"))
+        if(getShape)return(regions)
         gr2 <- as.data.frame(gr3)
         coordinates(gr2) <- ~lon + lat
         proj4string(gr2) <- CRS("+proj=longlat")
@@ -82,6 +84,10 @@ gridConstruct <- function(d, km=.5){
                  "Løgstør Grunde" = 39,
                  "Livø Bredning, Øst" = 36)
 
+    shp_natura2000 <<- lookupRegions("Habitatomraade16_intersect_hav",TRUE)
+    shp_lovns <<- lookupRegions("Habitatomraade30_Intersect_hav_explode_kun_lovns",TRUE)
+    shp_prod <<- lookupRegions("Alle_muslingeomraader_2011_region",TRUE)
+
     fac <- lookupRegions()
     remap <- c("Lovns Bredning, Øst", "Lovns Bredning, Vest")
     levels(fac)[levels(fac) %in% remap] <- "Lovns Bredning"
@@ -89,11 +95,24 @@ gridConstruct <- function(d, km=.5){
     NULL
 }
 
-
 plotMap <- function(..., add=FALSE){
     if(!add)plot(gr,...)
     points(map.pol[,1],map.pol[,2],type="l")
     polygon(map.pol[,1],map.pol[,2],col="grey")
+}
+
+## Plot regions on top
+plotRegions <- function(...) {
+    data(shp, package="mussel")
+    plot(shp_natura2000, add=TRUE, ...)
+    plot(shp_lovns, add=TRUE, ...)
+    omr <- c("32", "33", "34", "36", "37", "38", "39")
+    for(x in omr) {
+        sub <- subset(shp_prod, OMRådENUMM == x)
+        plot(sub, add=TRUE, ...)
+        co <- coordinates(sub)
+        text(co[1], co[2], x)
+    }
 }
 
 if(FALSE){ ## Create cache
@@ -114,6 +133,9 @@ if(FALSE){ ## Create cache
     ## Cache default grid, regions etc
     map.pol <- map.pol[8<map.pol[,1] & map.pol[,1]<10 & 56<map.pol[,2] & map.pol[,2]<58  , ]
     save(gr, map.pol, spatialRegions, spatialRegions2, file="data/grid.RData")
+    save(shp_lovns,
+         shp_natura2000,
+         shp_prod, file="data/shp.RData")
 }
 
 
