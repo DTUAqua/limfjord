@@ -111,6 +111,8 @@ spatialRegionIndicator <- function(gr) {
     natura2000 <- as.numeric(!is.na(lookupShape(gr, shp_natura2000)[[1]]))
     prodomr <- factor(lookupShape(gr, shp_prod)[[1]], exclude=NULL)
     A <- sparse.model.matrix( ~ prodomr + natura2000 + lovns - 1   )
+    colnames(A)[colnames(A) == "lovns"] <- "Lovns Bredning"
+    colnames(A)[colnames(A) == "natura2000"] <- "Natura Loegstoer"
     A
 }
 

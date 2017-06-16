@@ -266,4 +266,4 @@ plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),...) {
     }, env)
 }
 
-plotTimeSeries2 <- eval(parse(text=gsub("sdrep0","sdrep00",gsub("spatialRegions","spatialRegions2",deparse(plotTimeSeries)))))
+##plotTimeSeries2 <- eval(parse(text=gsub("sdrep0","sdrep00",gsub("spatialRegions","spatialRegions2",deparse(plotTimeSeries)))))
