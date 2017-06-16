@@ -85,10 +85,7 @@ Type objective_function<Type>::operator() ()
   */
   Type C;
   Type A = sweptArea.mean(); REPORT(A);
-  array<Type> b(NLEVELS(spatialRegions), NLEVELS(time));
-  b.setZero();
-  array<Type> cellcount(NLEVELS(spatialRegions), NLEVELS(time));
-  cellcount.setZero();
+  matrix<Type> b_full(NLEVELS(gf), NLEVELS(time));
   // Loop through *all* cells and times
   for(int i=0; i < NLEVELS(gf); i++){
     for(int j=0; j < NLEVELS(time); j++){
@@ -96,19 +93,30 @@ Type objective_function<Type>::operator() ()
       C = C / 1000.0; // Kg
       if (yearLevels(j) < 2017 ) {
         // Old Gear (until 2016)
-        b(spatialRegions(i), j) += 2.703 * pow(C/A, 0.29);
+        b_full(i, j) = 2.703 * pow(C/A, 0.29);
       } else {
         // New Gear (from 2017)
-        b(spatialRegions(i), j) += 2.470 * C/A;
+        b_full(i, j) = 2.470 * C/A;
       }
-      cellcount(spatialRegions(i), j) = cellcount(spatialRegions(i), j) + 1.0;
+      //cellcount(k, j) = cellcount(k, j) + 1.0;
     }
   }
-  b = b / cellcount;
+
+  // Aggregate biomass across regions
+  int nreg = regionIndicator.cols();
+  matrix<Type> b(nreg, NLEVELS(time));
+  b = regionIndicator.transpose() * b_full;
+
+  // Divide with cell count withing region
+  matrix<Type> one(NLEVELS(gf), NLEVELS(time));
+  one.fill(Type(1));
+  matrix<Type> cellcount(nreg, NLEVELS(time));
+  cellcount = regionIndicator.transpose() * one;
+  b = b.array() / cellcount.array();
 
   if(reportLog){
-    array<Type> logb(b);
-    logb = log(b);
+    matrix<Type> logb(b);
+    logb = log(b.array());
     REPORT(logb);
     ADREPORT(logb);
   } else {
