@@ -10,7 +10,8 @@ Type objective_function<Type>::operator() ()
   DATA_VECTOR(response);
   DATA_VECTOR(presence);
   DATA_VECTOR(sweptArea);      // by haul
-  DATA_FACTOR(spatialRegions); // by grid index
+  //DATA_FACTOR(spatialRegions); // by grid index
+  DATA_SPARSE_MATRIX(regionIndicator);
   //DATA_SCALAR(gridCellArea);   // km^2
   DATA_VECTOR(yearLevels);     // as.numeric(levels(Year))
   DATA_INTEGER(reportLog);

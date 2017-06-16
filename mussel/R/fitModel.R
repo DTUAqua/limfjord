@@ -1,5 +1,8 @@
 fitModel <- function(d, getLogIndex=FALSE, getIndex=TRUE, getLogB=TRUE) {
 
+## Rplaceing 'spatialRegion' factors
+regionIndicator = spatialRegionIndicator(gr)
+
 ## Attach grid cell to each haulid:
 d[[2]]$gf <- gridFactor(d,gr)
 
@@ -7,8 +10,8 @@ d[[2]]$gf <- gridFactor(d,gr)
 ## plot(as.data.frame(gr),col=unclass(spatialRegions))
 
 ## Avoid NAs in spatialRegions:
-levels(spatialRegions) <- c(levels(spatialRegions), "NA")
-spatialRegions[is.na(spatialRegions)] <- "NA"
+## levels(spatialRegions) <- c(levels(spatialRegions), "NA")
+## spatialRegions[is.na(spatialRegions)] <- "NA"
 
 ## Get area of grid cells (km^2):
 gridCellArea <- mean(summary(as.polygons(gr))$side.length)^2
@@ -41,7 +44,8 @@ data <- list(
     haulId=d[[2]]$haulId  ,
     response=d[[2]]$response  ,
     presence=d[[2]]$presence,
-    spatialRegions = spatialRegions,
+    ##spatialRegions = spatialRegions,
+    regionIndicator = regionIndicator,
     sweptArea = d[[2]]$sweptArea,
     gridCellArea = gridCellArea,
     yearLevels = as.numeric(levels(d$Year)),
@@ -99,21 +103,21 @@ if(getIndex){
     cat("Calc index spatialRegions\n")
     system.time( sdrep0 <- sdreport(obj3, hessian = hessian, bias.correct=TRUE) )
 
-    cat("Calc index spatialRegions2\n")
-    levels(spatialRegions2) <- c(levels(spatialRegions2), "NA")
-    spatialRegions2[is.na(spatialRegions2)] <- "NA"
-    data$spatialRegions <- spatialRegions2
-    obj3 <- MakeADFun(data=data,
-                      parameters=pl,
-                      random=c("^eta"),
-                      profile="mu",
-                      regexp=TRUE,
-                      DLL="mussel",
-                      map=map3
-                      )
-    obj3$fn(opt3$par)
-    obj3$env$data$reportLog <- 0 ## Natural scale report
-    system.time( sdrep00 <- sdreport(obj3, hessian = hessian, bias.correct=TRUE) )
+    ## cat("Calc index spatialRegions2\n")
+    ## levels(spatialRegions2) <- c(levels(spatialRegions2), "NA")
+    ## spatialRegions2[is.na(spatialRegions2)] <- "NA"
+    ## data$spatialRegions <- spatialRegions2
+    ## obj3 <- MakeADFun(data=data,
+    ##                   parameters=pl,
+    ##                   random=c("^eta"),
+    ##                   profile="mu",
+    ##                   regexp=TRUE,
+    ##                   DLL="mussel",
+    ##                   map=map3
+    ##                   )
+    ## obj3$fn(opt3$par)
+    ## obj3$env$data$reportLog <- 0 ## Natural scale report
+    ## system.time( sdrep00 <- sdreport(obj3, hessian = hessian, bias.correct=TRUE) )
 
 }
 
