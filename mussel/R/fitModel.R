@@ -216,9 +216,9 @@ plotTimeSeriesLog <- function(env,selectRegions = c("Thisted Bredning, Sydvest",
     local({
         est <- sdrep$unbiased$value
         sd <- summary(sdrep,"report")[,2]
-        ind <- (rbind(matrix(1:length(est),nlevels(spatialRegions),nlevels(time))))
+        ind <- (rbind(matrix(1:length(est),ncol(regionIndicator),nlevels(time))))
         mat <- cbind(est,est-1.96*sd,est+1.96*sd)
-        k <- match(selectRegions, levels(spatialRegions))
+        k <- match(selectRegions, colnames(regionIndicator))
         for(i in 1:length(selectRegions)){
             ylim <- range(exp(mat[ind[k,],]))
             xlab <- "Year"
@@ -239,9 +239,9 @@ plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),...) {
     local({
         est <- sdrep0$unbiased$value
         sd <- summary(sdrep0,"report")[,2]
-        ind <- (rbind(matrix(1:length(est),nlevels(spatialRegions),nlevels(time))))
+        ind <- (rbind(matrix(1:length(est),ncol(regionIndicator),nlevels(time))))
         mat <- cbind(Estimate=est,Lower=est-1.96*sd,Upper=est+1.96*sd)
-        k <- match(selectRegions, levels(spatialRegions))
+        k <- match(selectRegions, colnames(regionIndicator))
         newmat <- mat[ind[k,],]
         rownames(newmat) <- levels(time)
         newmat <- newmat[-1,]
@@ -253,11 +253,12 @@ plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),...) {
         title(selectRegions)
         ##points(as.numeric(names(b)),b)
         ## FIXME: Make 'km' part of grid object
-        km <- summary(as.polygons(gr))$side.length[1,4]
+        ## km <- summary(as.polygons(gr))$side.length[1,4]
         ## Number of grid cells in area
-        numCells <- sum(as.character(spatialRegions) == selectRegions, na.rm=TRUE)
+        ## numCells <- sum(as.character(spatialRegions) == selectRegions, na.rm=TRUE)
+        numCells <- sum(regionIndicator[,selectRegions])
         ## Total area
-        A <- km^2 * 1e6 * numCells
+        A <- gridCellArea * 1e6 * numCells
         newmat <- cbind(newmat, newmat * A)
         colnames(newmat)[1] <- "Density (kg/m^2)"
         colnames(newmat)[4] <- "Total (kg)"
