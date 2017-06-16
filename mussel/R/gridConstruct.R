@@ -95,6 +95,25 @@ gridConstruct <- function(d, km=.5){
     NULL
 }
 
+lookupShape <- function(gr, shape) {
+    proj4 <- proj4string(shape)
+    regions <- spTransform(shape,CRS("+proj=longlat"))
+    gr2 <- as.data.frame(gr)
+    coordinates(gr2) <- ~lon + lat
+    proj4string(gr2) <- CRS("+proj=longlat")
+    xtra <- over(gr2, regions)
+    xtra
+}
+
+spatialRegionIndicator <- function(gr) {
+    data(shp, package="mussel")
+    lovns <- as.numeric(!is.na(lookupShape(gr, shp_lovns)[[1]]))
+    natura2000 <- as.numeric(!is.na(lookupShape(gr, shp_natura2000)[[1]]))
+    prodomr <- factor(lookupShape(gr, shp_prod)[[1]], exclude=NULL)
+    A <- sparse.model.matrix( ~ prodomr + natura2000 + lovns - 1   )
+    A
+}
+
 plotMap <- function(..., add=FALSE){
     if(!add)plot(gr,...)
     points(map.pol[,1],map.pol[,2],type="l")
