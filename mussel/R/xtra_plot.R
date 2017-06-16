@@ -12,7 +12,7 @@ plotBiomassMap <- function(env, time="2016", xlim=c(9.15,9.35), ylim=c(56.6,56.7
         probs <- seq(0,1,length=26)
         br <- quantile(exp(env$logB),probs)
         col <- rev(topo.colors(25))
-        image(gr, resp , map=quote(plotMap(add=TRUE)),  add=TRUE, breaks=br, col=col)
+        image(gr, resp , map=quote({plotMap(add=TRUE);plotRegions()}),  add=TRUE, breaks=br, col=col)
         i <- seq(1,26,by=5)
         qw <- subset(d,unclass(time) == y)
         if (FALSE) text(qw$lon,qw$lat+c(-.01,0,.01)/3,qw$TotalWeight,col="red")
