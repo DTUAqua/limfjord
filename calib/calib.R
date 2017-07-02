@@ -103,7 +103,7 @@ points(df2, pch=16, col=grepl(" ", rownames(df))+1)
 
 
 ## Plot in sqrt-transformed domain
-tplot <- function(f,a,b,...){plot(function(x)sqrt(f(x^2)), sqrt(a), sqrt(b), ..., xlab="sqrt(x)", ylab="sqrt(y)")}
+tplot <- function(f,a,b,...){plot(function(x)sqrt(f(x^2)), sqrt(a), sqrt(b), ..., xlab="sqrt(x)", ylab="sqrt(y)", lwd=2)}
 tplot(f0,0,15)
 tplot(f1,0,15,add=TRUE,col=2)
 tplot(f2,0,15,add=TRUE,col=3)
@@ -113,4 +113,35 @@ tplot(f3,0,15,add=TRUE,col=4)
 ##points(sqrt(df2), pch=16, col="red")
 points(sqrt(df), pch=16, col=grepl(" ", rownames(df))+1)
 
+###################### TMB
+data1 <- with(dd, data.frame(
+                      Density = Total / Area,
+                      Station = Station,
+                      AreaFac = factor(Area),
+                      Inside = as.integer(Dredge == "inside"),
+                      Gear = Gear
+                  ))
+data1 <- na.omit(data1)
 
+data <- data1
+
+parameters <- with(data,
+                   list(
+                       logmu  = numeric(nlevels(Station)),
+                       logphi = numeric(nlevels(AreaFac)),
+                       power = 1.5,
+                       a = 1 + numeric(nlevels(Gear)),
+                       b = 1 + numeric(nlevels(Gear))
+                   ))
+
+require(TMB)
+compile("calib.cpp")
+dyn.load(dynlib("calib"))
+
+################################################################################
+
+model <- MakeADFun(data, parameters)
+fit <- nlminb(model$par, model$fn, model$gr)
+rep <- sdreport(model)
+
+print(rep)
