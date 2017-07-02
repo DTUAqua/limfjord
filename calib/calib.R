@@ -114,6 +114,8 @@ tplot(f3,0,15,add=TRUE,col=4)
 points(sqrt(df), pch=16, col=grepl(" ", rownames(df))+1)
 
 ###################### TMB
+refac <- function(data) data.frame(lapply(na.omit(data), function(x) if(is.factor(x)) factor(x) else x))
+
 data1 <- with(dd, data.frame(
                       Density = Total / Area,
                       Station = Station,
@@ -122,7 +124,9 @@ data1 <- with(dd, data.frame(
                       Gear = Gear
                   ))
 levels(data1$Station) <- paste(levels(data1$Station), "Total")
-data1 <- na.omit(data1)
+levels(data1$Gear)    <- paste(levels(data1$Gear),    "Total")
+levels(data1$AreaFac) <- paste(levels(data1$AreaFac), "Total")
+data1 <- refac(data1)
 
 data2 <- with(dd, data.frame(
                       Density = BMS / Area,
@@ -132,20 +136,22 @@ data2 <- with(dd, data.frame(
                       Gear = Gear
                   ))
 levels(data2$Station) <- paste(levels(data2$Station), "BMS")
-data2 <- na.omit(data2)
+levels(data2$Gear)    <- paste(levels(data2$Gear),    "BMS")
+levels(data2$AreaFac) <- paste(levels(data2$AreaFac), "BMS")
+data2 <- refac(data2)
 
 
-data <- rbind(data1, data2)
-data <- lapply(data, function(x) if(is.factor(x)) factor(x) else x)
+data <- refac(rbind(data1, data2))
 
-parameters <- with(data,
-                   list(
-                       logmu  = numeric(nlevels(Station)),
-                       logphi = numeric(nlevels(AreaFac)),
-                       power = 1.5,
-                       a = 1 + numeric(nlevels(Gear)),
-                       b = 1 + numeric(nlevels(Gear))
-                   ))
+parameters <- function(data)
+    with(data,
+         list(
+             logmu  = numeric(nlevels(Station)),
+             logphi = numeric(nlevels(AreaFac)),
+             power = 1.5,
+             a = 1 + numeric(nlevels(Gear)),
+             b = 1 + numeric(nlevels(Gear))
+         ))
 
 require(TMB)
 compile("calib.cpp")
@@ -153,7 +159,7 @@ dyn.load(dynlib("calib"))
 
 ################################################################################
 
-obj <- MakeADFun(data, parameters)
+obj <- MakeADFun(data, parameters(data))
 fit <- nlminb(obj$par, obj$fn, obj$gr)
 rep <- sdreport(obj)
 
