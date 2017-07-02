@@ -117,13 +117,26 @@ points(sqrt(df), pch=16, col=grepl(" ", rownames(df))+1)
 data1 <- with(dd, data.frame(
                       Density = Total / Area,
                       Station = Station,
-                      AreaFac = factor(Area),
+                      AreaFac = cut(Area, breaks=c(0,1,200)),
                       Inside = as.integer(Dredge == "inside"),
                       Gear = Gear
                   ))
+levels(data1$Station) <- paste(levels(data1$Station), "Total")
 data1 <- na.omit(data1)
 
-data <- data1
+data2 <- with(dd, data.frame(
+                      Density = BMS / Area,
+                      Station = Station,
+                      AreaFac = cut(Area, breaks=c(0,1,200)),
+                      Inside = as.integer(Dredge == "inside"),
+                      Gear = Gear
+                  ))
+levels(data2$Station) <- paste(levels(data2$Station), "BMS")
+data2 <- na.omit(data2)
+
+
+data <- rbind(data1, data2)
+data <- lapply(data, function(x) if(is.factor(x)) factor(x) else x)
 
 parameters <- with(data,
                    list(
@@ -140,8 +153,13 @@ dyn.load(dynlib("calib"))
 
 ################################################################################
 
-model <- MakeADFun(data, parameters)
-fit <- nlminb(model$par, model$fn, model$gr)
-rep <- sdreport(model)
+obj <- MakeADFun(data, parameters)
+fit <- nlminb(obj$par, obj$fn, obj$gr)
+rep <- sdreport(obj)
 
 print(rep)
+cat(paste0(fit$objective, " (df=",length(fit$par),")\n") )
+
+## Joint: 701.223884983253 (df=32)
+## Data1: 391.7284 (df=14)
+## Data2: 294.97863087435 (df=23)
