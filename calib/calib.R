@@ -188,7 +188,28 @@ rep <- sdreport(obj)
 
 print(rep)
 cat(paste0(fit$objective, " (df=",length(fit$par),")\n") )
+fit1 <- fit
 
 ## Joint: 686.877140102969 (df=36)
 ## Data1: 391.7284 (df=14)
 ## Data2: 294.97863087435 (df=23)
+
+## Collect Gears
+levels(data$Gear)[] <- "collect"
+obj <- MakeADFun(data, parameters(data))
+fit <- nlminb(obj$par, obj$fn, obj$gr)
+rep <- sdreport(obj)
+
+print(rep)
+cat(paste0(fit$objective, " (df=",length(fit$par),")\n") )
+fit2 <- fit
+
+## p value for H0: identical gears
+1-pchisq(2*(fit2$objective-fit1$objective), df=length(fit1$par)-length(fit2$par))
+
+tplot(function(x)(1/fit2$par["a"])^(1/(fit2$par["b"]+1))*x^(1/(fit2$par["b"]+1)), 0, 15, add=!TRUE, col="black")
+tplot(f1,0,15,add=TRUE,col=2)
+tplot(f3,0,15,add=TRUE,col=4)
+##points(sqrt(df), pch=16, col=grepl(" ", rownames(df))+1)
+points(sqrt(df), pch=c(1,16)[grepl(" ", rownames(df))+1])
+legend("topleft",c("Tweedie", "Gaussian", "Dolmer"), lwd=2, col=c(1,2,4))
