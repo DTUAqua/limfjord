@@ -11,7 +11,8 @@ Type objective_function<Type>::operator() ()
                          // the station code.
   DATA_FACTOR(AreaFac);  // Variance depends on area
   DATA_FACTOR(Gear);     // Which gear is it ?
-  
+  DATA_VECTOR(x);        // Optional grid to evaluate power function
+
   PARAMETER_VECTOR(logmu); // Mean 
   PARAMETER_VECTOR(logphi); // Tweedie
   PARAMETER(power); // Tweedie
@@ -29,8 +30,15 @@ Type objective_function<Type>::operator() ()
   b = Type(1) / (Type(1) + b);
   a = Type(1) / a;
   a = pow(a, b);
-  ADREPORT(a);
-  ADREPORT(b);
+  if(x.size() == 0) {
+    ADREPORT(a);
+    ADREPORT(b);
+  } else {
+    vector<Type> y = a(0) * pow(x, b(0));
+    REPORT(x);
+    REPORT(y);
+    ADREPORT(y);
+  }
 
   return ans;
 }

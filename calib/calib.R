@@ -187,6 +187,7 @@ dyn.load(dynlib("calib"))
 
 ################################################################################
 
+data <- as.list(data); data$x <- numeric(0)
 obj <- MakeADFun(data, parameters(data))
 fit <- nlminb(obj$par, obj$fn, obj$gr)
 rep <- sdreport(obj)
@@ -221,5 +222,7 @@ legend("topleft",c("Tweedie", "Gaussian", "Dolmer"), lwd=2, col=c(1,2,4))
 
 sdr <- sdreport(obj)
 summary(sdr,"report")
-sdr$value
-sdr$cov
+quadform <- list(
+    mu = sdr$value,
+    hessian = solve(sdr$cov)
+)
