@@ -59,7 +59,8 @@ parameters <- list(
     logdelta=c(0,0),
     logscale=matrix(0,nlevels(time),2),
     logsd_nugget=rep(0,nlevels(time)),
-    mu=rep(0,nlevels(time))
+    mu=rep(0,nlevels(time)),
+    calib=c(0,0)
 )
 
 
@@ -90,7 +91,7 @@ obj3 <- MakeADFun(data=data,
                   DLL="mussel",
                   map=map3
                   )
-obj3$par <- structure(c(-7.5724043055008, -4.46731216093986, 0.207982042852333,  0.907872821912759, 0.278968517094824), .Names = c("logdelta",  "logdelta", "logscale", "logscale", "logsd_nugget"))
+obj3$par <- structure(c(-7.5724043055008, -4.46731216093986, 0.207982042852333,  0.907872821912759, 0.278968517094824, 0, 0), .Names = c("logdelta",  "logdelta", "logscale", "logscale", "logsd_nugget","calib","calib"))
 system.time(opt3 <- nlminb(obj3$par,obj3$fn,obj3$gr,control=list(trace=1)))
 hessian <- optimHess(opt3$par, obj3$fn, obj3$gr)
 eigen(hessian)$val

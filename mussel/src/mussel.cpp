@@ -23,10 +23,23 @@ Type objective_function<Type>::operator() ()
   PARAMETER_ARRAY(logscale);         // Dim = c(ntime,2)
   PARAMETER_VECTOR(logsd_nugget);    // Length = ntime
   PARAMETER_VECTOR(mu);              // Length = ntime
+  /* Gear calibration parameters (mle=zero) */
+  PARAMETER_VECTOR(calib);
+
+  Type ans=0;
+
+  // Hardcode Gear calibration parameters and uncertainties
+  vector<Type> calib_mean(2);
+  calib_mean << 6.1157081, 0.6343874;
+  matrix<Type> calib_hessian(2, 2);
+  calib_hessian <<
+    4.739194,  -2.967676,
+    -2.967676, 325.180965 ;
+  ans += .5 * ( calib * (calib_hessian * calib) ).sum();
+  calib = calib + calib_mean;
 
   vector<Type> sd_nugget=exp(logsd_nugget);
   int nhaul=response.size();
-  Type ans=0;
   using namespace density;
   /* Time covariance */
   N01<Type> nldens_time;
@@ -91,13 +104,7 @@ Type objective_function<Type>::operator() ()
     for(int j=0; j < NLEVELS(time); j++){
       C = exp(eta_density(i,j) + log(1.0/(1.0+exp(-eta_presence(i,j)))) + mu(j));
       C = C / 1000.0; // Kg
-      if (yearLevels(j) < 2017 ) {
-        // Old Gear (until 2016)
-        b_full(i, j) = 2.703 * pow(C/A, 0.29);
-      } else {
-        // New Gear (from 2017)
-        b_full(i, j) = 2.470 * C/A;
-      }
+      b_full(i, j) = calib(0) * pow(C/A, calib(1));
       //cellcount(k, j) = cellcount(k, j) + 1.0;
     }
   }
