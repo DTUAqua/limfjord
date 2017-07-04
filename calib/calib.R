@@ -61,6 +61,29 @@ d3$Gear <- "new"
 
 dd <- rbind(dd, d3)
 
+## =========================== NEW GEAR TOTAL CATCHES
+
+## Area 35
+tot <- c(0, 61, 93, 89, 121)
+bms <- c(0, 3.65, 4.2, 3.9, 14.15)
+shells <- c(0, 0.8, 0.75, 1.85, 2.57)
+bms35 <- tot * bms / (bms + shells)
+
+## Area 39
+tot <- c(253, 154, 306, 354)
+bms <- c(7.70, 7.80, 7.75, 7.80)
+shells <- c(0.200, 0.150, 0.200, 0.200)
+bms39 <- tot * bms / (bms + shells)
+
+d4 <- data.frame(
+    Total = NA, ## FIXME !!!!
+    BMS = c(bms35[-1], bms39),
+    Station = c(paste(35, 1:4), paste(39, 1:4)),
+    Area = 100,
+    Dredge = "inside"
+)
+d4$Gear <- "new"
+dd <- rbind(dd, d4)
 
 ## library(glmmTMB)
 ## fit <- glmmTMB( Total ~ Station + offset(log(Area)) + Gear - 1, data=dd, family=poisson(link="log") )
@@ -166,6 +189,6 @@ rep <- sdreport(obj)
 print(rep)
 cat(paste0(fit$objective, " (df=",length(fit$par),")\n") )
 
-## Joint: 701.223884983253 (df=32)
+## Joint: 686.877140102969 (df=36)
 ## Data1: 391.7284 (df=14)
 ## Data2: 294.97863087435 (df=23)
