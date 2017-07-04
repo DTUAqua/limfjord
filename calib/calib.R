@@ -126,7 +126,12 @@ points(df2, pch=16, col=grepl(" ", rownames(df))+1)
 
 
 ## Plot in sqrt-transformed domain
-tplot <- function(f,a,b,...){plot(function(x)sqrt(f(x^2)), sqrt(a), sqrt(b), ..., xlab="sqrt(x)", ylab="sqrt(y)", lwd=2)}
+tplot <- function(f, a, b, ...) {
+    plot(function(x)sqrt(f(x^2)), sqrt(a), sqrt(b), ..., xlab="Density inside (kg/m^2)", ylab="Density outside (kg/m^2)", lwd=2, axes=FALSE)
+    axis(1, at=0:6, labels=(0:6)^2)
+    axis(2, at=0:6, labels=(0:6)^2, las=1)
+    box()
+}
 tplot(f0,0,15)
 tplot(f1,0,15,add=TRUE,col=2)
 tplot(f2,0,15,add=TRUE,col=3)
@@ -213,3 +218,8 @@ tplot(f3,0,15,add=TRUE,col=4)
 ##points(sqrt(df), pch=16, col=grepl(" ", rownames(df))+1)
 points(sqrt(df), pch=c(1,16)[grepl(" ", rownames(df))+1])
 legend("topleft",c("Tweedie", "Gaussian", "Dolmer"), lwd=2, col=c(1,2,4))
+
+sdr <- sdreport(obj)
+summary(sdr,"report")
+sdr$value
+sdr$cov

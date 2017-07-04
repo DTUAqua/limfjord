@@ -25,5 +25,12 @@ Type objective_function<Type>::operator() ()
     Type phi = exp(logphi(AreaFac(i)));
     ans -= dtweedie(Density(i), mueff, phi, power, true);
   }
+
+  b = Type(1) / (Type(1) + b);
+  a = Type(1) / a;
+  a = pow(a, b);
+  ADREPORT(a);
+  ADREPORT(b);
+
   return ans;
 }
