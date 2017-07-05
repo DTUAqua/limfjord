@@ -111,15 +111,18 @@ points(log(df2), col="red" , pch=16)
 summary(fm0 <- lm(outside~inside-1,data=df))
 summary(fm1 <- lm(log(outside)~log(inside),data=df))
 summary(fm2 <- lm(sqrt(outside)~sqrt(inside),data=df))
+fm4 <- nls(log(outside) ~ nlb + log(inside) - log(1-exp(-a*inside)) ,start=c(nlb=0, a=1),data=na.omit(df))
 
 f0 <- function(x)coef(fm0) * x
 f1 <- function(x)exp(coef(fm1)[1]) * x^coef(fm1)[2]
 f2 <- function(x)coef(fm2)[2]*x+ coef(fm2)[1] +2*prod(coef(fm2))*sqrt(x)
 f3 <- function(x)2.703*x^0.29
+f4 <- function(x){b <- exp(-coef(fm4)["nlb"]); a <- coef(fm4)["a"]; x/(b*(1-exp(-a*x)))}
 plot(f0,0,15)
 plot(f1,0,15,add=TRUE,col=2)
 plot(f2,0,15,add=TRUE,col=3)
 plot(f3,0,15,add=TRUE,col=4)
+plot(f4,0,15,add=TRUE,col=5)
 ## abline(v=range(df$inside, na.rm=TRUE))
 ## points(df, pch=16)
 points(df2, pch=16, col=grepl(" ", rownames(df))+1)
@@ -128,14 +131,16 @@ points(df2, pch=16, col=grepl(" ", rownames(df))+1)
 ## Plot in sqrt-transformed domain
 tplot <- function(f, a, b, ...) {
     plot(function(x)sqrt(f(x^2)), sqrt(a), sqrt(b), ..., xlab="Density inside (kg/m^2)", ylab="Density outside (kg/m^2)", lwd=2, axes=FALSE)
-    axis(1, at=0:6, labels=(0:6)^2)
-    axis(2, at=0:6, labels=(0:6)^2, las=1)
+    x <- 0:10
+    axis(1, at=x, labels=(x)^2)
+    axis(2, at=x, labels=(x)^2, las=1)
     box()
 }
 tplot(f0,0,15)
 tplot(f1,0,15,add=TRUE,col=2)
 tplot(f2,0,15,add=TRUE,col=3)
 tplot(f3,0,15,add=TRUE,col=4)
+tplot(f4,0,15,add=TRUE,col=5)
 ## abline(v=range(df$inside, na.rm=TRUE))
 ##points(sqrt(df), pch=16)
 ##points(sqrt(df2), pch=16, col="red")
@@ -213,12 +218,13 @@ fit2 <- fit
 ## p value for H0: identical gears
 1-pchisq(2*(fit2$objective-fit1$objective), df=length(fit1$par)-length(fit2$par))
 
-tplot(function(x)(1/fit2$par["a"])^(1/(fit2$par["b"]+1))*x^(1/(fit2$par["b"]+1)), 0, 15, add=!TRUE, col="black")
-tplot(f1,0,15,add=TRUE,col=2)
-tplot(f3,0,15,add=TRUE,col=4)
+tplot(function(x)(1/fit2$par["a"])^(1/(fit2$par["b"]+1))*x^(1/(fit2$par["b"]+1)), 0, 36, add=!TRUE, col="black")
+tplot(f1,0,36,add=TRUE,col=2)
+tplot(f3,0,36,add=TRUE,col=4)
 ##points(sqrt(df), pch=16, col=grepl(" ", rownames(df))+1)
 points(sqrt(df), pch=c(1,16)[grepl(" ", rownames(df))+1])
 legend("topleft",c("Tweedie", "Gaussian", "Dolmer"), lwd=2, col=c(1,2,4))
+abline(0,1,lty="dashed")
 
 sdr <- sdreport(obj)
 summary(sdr,"report")
