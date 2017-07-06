@@ -87,7 +87,7 @@ gridConstruct <- function(d, km=.5){
     shp_natura2000 <<- lookupRegions("Habitatomraade16_intersect_hav",TRUE)
     shp_lovns <<- lookupRegions("Habitatomraade30_Intersect_hav_explode_kun_lovns",TRUE)
     shp_prod <<- lookupRegions("Alle_muslingeomraader_2011_region",TRUE)
-
+    shp_forbud <<- lookupRegions("Forbudsomraader_musling",TRUE)
     fac <- lookupRegions()
     remap <- c("Lovns Bredning, Øst", "Lovns Bredning, Vest")
     levels(fac)[levels(fac) %in% remap] <- "Lovns Bredning"
@@ -156,7 +156,8 @@ if(FALSE){ ## Create cache
     save(gr, map.pol, spatialRegions, spatialRegions2, file="data/grid.RData")
     save(shp_lovns,
          shp_natura2000,
-         shp_prod, file="data/shp.RData")
+         shp_prod,
+         shp_forbud, file="data/shp.RData")
 }
 
 
