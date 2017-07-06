@@ -127,6 +127,8 @@ plotRegions <- function(...) {
     data(shp, package="mussel")
     plot(shp_natura2000, add=TRUE, border="red", lwd=2)
     plot(shp_lovns, add=TRUE, ...)
+    ##plot(shp_forbud, add=TRUE, col=adjustcolor( "red", alpha.f = 0.5))
+    plot(shp_forbud, add=TRUE, density=20)
     omr <- c("32", "33", "34", "36", "37", "38", "39")
     for(x in omr) {
         sub <- subset(shp_prod, OMRådENUMM == x)
