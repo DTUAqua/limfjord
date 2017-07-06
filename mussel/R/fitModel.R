@@ -236,10 +236,12 @@ plotTimeSeriesLog <- function(env,selectRegions = c("Thisted Bredning, Sydvest",
 }
 
 plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),
-                           unit=c("kilotons", "tons", "kg/m^2"),...) {
+                           unit=c("kilotons", "tons", "kg/m^2"),
+                           threshold=1,...) {
     unit <- match.arg(unit)
     env$unit <- unit
     env$selectRegions <- selectRegion
+    env$threshold <- threshold
     local({
         est <- sdrep0$unbiased$value
         sd <- summary(sdrep0,"report")[,2]
@@ -248,7 +250,7 @@ plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),
         k <- match(selectRegions, colnames(regionIndicator))
         newmat <- mat[ind[k,],]
         rownames(newmat) <- levels(time)
-        newmat <- newmat[-1,]
+        newmat <- newmat[-1,]  ## Remove first year (2004)
 
         ##points(as.numeric(names(b)),b)
         ## FIXME: Make 'km' part of grid object
@@ -267,9 +269,16 @@ plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),
         mtext(xlab,1,line=2.5)
         title(selectRegions)
 
-        newmat <- cbind(newmat, newmat * A * 1e-3)
+        Bsubset <- exp(logB[as.logical(regionIndicator[, selectRegions]), ])
+        Bsubset <- Bsubset[, -1] ## Remove first year (2004)
+        Bsubset <- Bsubset * (Bsubset > threshold)
+        Bsubset <- Bsubset * (gridCellArea * 1e6) * 1e-3 ## Tons
+        Bsubset <- colSums(Bsubset)
+
+        newmat <- cbind(newmat, newmat * A * 1e-3, Bsubset)
         colnames(newmat)[1] <- "Density (kg/m^2)"
         colnames(newmat)[4] <- "Total (tons)"
+        colnames(newmat)[7] <- paste0("Total[Density>",threshold,"] (tons)")
         newmat
     }, env)
 }
