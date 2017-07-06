@@ -132,7 +132,7 @@ plotRegions <- function(...) {
         sub <- subset(shp_prod, OMRådENUMM == x)
         plot(sub, add=TRUE, ...)
         co <- coordinates(sub)
-        text(co[1], co[2], x)
+        text(co[1], co[2], x, font=2)
     }
 }
 
