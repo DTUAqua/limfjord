@@ -125,7 +125,7 @@ plotMap <- function(..., add=FALSE){
 ## Plot regions on top
 plotRegions <- function(...) {
     data(shp, package="mussel")
-    plot(shp_natura2000, add=TRUE, ...)
+    plot(shp_natura2000, add=TRUE, border="red", lwd=2)
     plot(shp_lovns, add=TRUE, ...)
     omr <- c("32", "33", "34", "36", "37", "38", "39")
     for(x in omr) {
@@ -134,6 +134,10 @@ plotRegions <- function(...) {
         co <- coordinates(sub)
         text(co[1], co[2], x, font=2)
     }
+    legend("topleft",
+           c("Habitatområde 16 (marint)", "Produktionsområde", "Stationer"),
+           lwd=c(2,1,NA), pch=c(NA,NA,1), col=c("red", "black", "black"),
+           bty="n")
 }
 
 if(FALSE){ ## Create cache
