@@ -235,7 +235,10 @@ plotTimeSeriesLog <- function(env,selectRegions = c("Thisted Bredning, Sydvest",
     }, env)
 }
 
-plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),...) {
+plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),
+                           unit=c("kilotons", "tons", "kg/m^2"),...) {
+    unit <- match.arg(unit)
+    env$unit <- unit
     env$selectRegions <- selectRegion
     local({
         est <- sdrep0$unbiased$value
@@ -246,23 +249,27 @@ plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),...) {
         newmat <- mat[ind[k,],]
         rownames(newmat) <- levels(time)
         newmat <- newmat[-1,]
-        matplot(as.numeric(rownames(newmat)),newmat,type="l", col=1, lty=c(1,2,2), xlab="", ylab="", las=1, ylim=c(0,max(newmat)))
-        xlab <- "Year"
-        ylab <- expression(`b  `(kg/m^2))
-        mtext(ylab,2,line=2.5)
-        mtext(xlab,1,line=2.5)
-        title(selectRegions)
+
         ##points(as.numeric(names(b)),b)
         ## FIXME: Make 'km' part of grid object
         ## km <- summary(as.polygons(gr))$side.length[1,4]
         ## Number of grid cells in area
         ## numCells <- sum(as.character(spatialRegions) == selectRegions, na.rm=TRUE)
         numCells <- sum(regionIndicator[,selectRegions])
-        ## Total area
+        ## Total area (m^2)
         A <- gridCellArea * 1e6 * numCells
-        newmat <- cbind(newmat, newmat * A)
+
+        multiplier <- c("kilotons"= A * 1e-6, "tons"= A * 1e-3, "kg/m^2"=1)[unit]
+        matplot(as.numeric(rownames(newmat)),newmat*multiplier,type="l", col=1, lty=c(1,2,2), xlab="", ylab="", las=1, ylim=c(0,max(newmat*multiplier)))
+        xlab <- "Year"
+        ylab <- eval(parse(text=paste0("expression(`Biomasse `(",unit,"))"))[[1]])
+        mtext(ylab,2,line=2.5)
+        mtext(xlab,1,line=2.5)
+        title(selectRegions)
+
+        newmat <- cbind(newmat, newmat * A * 1e-3)
         colnames(newmat)[1] <- "Density (kg/m^2)"
-        colnames(newmat)[4] <- "Total (kg)"
+        colnames(newmat)[4] <- "Total (tons)"
         newmat
     }, env)
 }
