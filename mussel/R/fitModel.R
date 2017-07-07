@@ -277,14 +277,13 @@ plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),
 
         Bsubset <- exp(logB[as.logical(regionIndicator[, selectRegions]), ])
         Bsubset <- Bsubset[, -1] ## Remove first year (2004)
-        Bsubset <- Bsubset * (Bsubset > threshold)
-        Bsubset <- Bsubset * (gridCellArea * 1e6) * 1e-3 ## Tons
-        Bsubset <- colSums(Bsubset)
+        Bsubset[Bsubset < threshold] <- NA
+        Bsubset <- colMeans(Bsubset, na.rm=TRUE)
 
         newmat <- cbind(newmat, newmat * A * 1e-3, Bsubset)
         colnames(newmat)[1] <- "Density (kg/m^2)"
         colnames(newmat)[4] <- "Total (tons)"
-        colnames(newmat)[7] <- paste0("Total[Density>",threshold,"] (tons)")
+        colnames(newmat)[7] <- paste0("Density[Density>",threshold,"] (kg/m^2)")
         newmat
     }, env)
 }
