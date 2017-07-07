@@ -136,14 +136,20 @@ if(getLogB) {
     ##     unclass(factor(seq_len(nrow(gr))))-1
     ## storage.mode(obj3$env$data$spatialRegions) <- "double"
     obj3$env$data$regionIndicator <- as(.symDiagonal(nrow(gr)), "dgTMatrix")
-    obj3$env$data$reportLog <- 1
-    ##obj3$retape()
-    local( {
-        Fun <- .Call("MakeDoubleFunObject", data, parameters, reportenv, PACKAGE = DLL)
-    },
-    obj3$env)
-    logB <- obj3$report(lpb)$logb
-}
+    if(FALSE) { ## Old version without bias correction
+        obj3$env$data$reportLog <- 1
+        ##obj3$retape()
+        local( {
+            Fun <- .Call("MakeDoubleFunObject", data, parameters, reportenv, PACKAGE = DLL)
+        },
+        obj3$env)
+        logB <- obj3$report(lpb)$logb
+    }
+    ## reportLog = 0 by default
+    system.time( sdrep000 <- sdreport(obj3, ignore.parm.uncertainty=TRUE, skip.delta.method=TRUE, bias.correct=TRUE) )
+    logB <- log(sdrep000$unbiased$value)
+    dim(logB) <- c(nrow(gr), nlevels(data$time))
+    }
 
 environment()
 }
