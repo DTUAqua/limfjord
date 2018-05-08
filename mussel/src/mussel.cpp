@@ -30,11 +30,11 @@ Type objective_function<Type>::operator() ()
 
   // Hardcode Gear calibration parameters and uncertainties
   vector<Type> calib_mean(2);
-  calib_mean << 6.1157081, 0.6343874;
+  calib_mean << 0.05470782, 1.81567366;
   matrix<Type> calib_hessian(2, 2);
   calib_hessian <<
-    4.739194,  -2.967676,
-    -2.967676, 325.180965 ;
+    12513.5960, 923.45777,
+    923.45777,  87.71207;
   ans += .5 * ( calib * (calib_hessian * calib) ).sum();
   calib = calib + calib_mean;
 
@@ -95,6 +95,12 @@ Type objective_function<Type>::operator() ()
      b = 2.703 * (C/A)^0.29
 
      Units: C (kg) and A (m^2)
+
+     New formulation
+     ^^^^^^^^^^^^^^^
+
+     b = 0.05 * (C/A)^1.82 + (C/A)^1
+
   */
   Type C;
   Type A = sweptArea.mean(); REPORT(A);
@@ -104,7 +110,7 @@ Type objective_function<Type>::operator() ()
     for(int j=0; j < NLEVELS(time); j++){
       C = exp(eta_density(i,j) + log(1.0/(1.0+exp(-eta_presence(i,j)))) + mu(j));
       C = C / 1000.0; // Kg
-      b_full(i, j) = calib(0) * pow(C/A, calib(1));
+      b_full(i, j) = calib(0) * pow(C/A, calib(1)) + C/A;
       //cellcount(k, j) = cellcount(k, j) + 1.0;
     }
   }
