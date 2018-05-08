@@ -183,7 +183,8 @@ parameters <- function(data)
              logphi = numeric(nlevels(AreaFac)),
              power = 1.5,
              a = 1 + numeric(nlevels(Gear)),
-             b = 1 + numeric(nlevels(Gear))
+             b = 1 + numeric(nlevels(Gear)),
+             c = 0 + numeric(nlevels(Gear))
          ))
 
 require(TMB)
@@ -194,7 +195,7 @@ dyn.load(dynlib("calib"))
 
 data <- as.list(data); data$x <- numeric(0)
 obj <- MakeADFun(data, parameters(data))
-fit <- nlminb(obj$par, obj$fn, obj$gr)
+fit <- nlminb(obj$par + .01, obj$fn, obj$gr)
 rep <- sdreport(obj)
 
 print(rep)
@@ -207,8 +208,9 @@ fit1 <- fit
 
 ## Collect Gears
 levels(data$Gear)[] <- "collect"
-obj <- MakeADFun(data, parameters(data))
-fit <- nlminb(obj$par, obj$fn, obj$gr)
+map <- list(c=factor(NA))
+obj <- MakeADFun(data, parameters(data), map=map)
+fit <- nlminb(obj$par + .01, obj$fn, obj$gr, control=list(iter.max=1e4,eval.max=1e4))
 rep <- sdreport(obj)
 
 print(rep)
@@ -228,7 +230,8 @@ abline(0,1,lty="dashed")
 
 sdr <- sdreport(obj)
 summary(sdr,"report")
+nm <- 1:2
 quadform <- list(
-    mu = sdr$value,
-    hessian = solve(sdr$cov)
+    mu = sdr$value[nm],
+    hessian = solve(sdr$cov[nm, nm])
 )
