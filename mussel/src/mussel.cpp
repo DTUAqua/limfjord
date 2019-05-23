@@ -25,6 +25,14 @@ Type objective_function<Type>::operator() ()
   PARAMETER_VECTOR(mu);              // Length = ntime
   /* Gear calibration parameters (mle=zero) */
   PARAMETER_VECTOR(calib);
+  /* Optional explanatory variables */
+  vector<Type> mu_extra;
+  PARAMETER_VECTOR(beta);
+  if (beta.size() > 0) {
+    DATA_MATRIX(X);
+    mu_extra.resize(X.rows());
+    mu_extra = X * beta;
+  }
 
   Type ans=0;
 
@@ -70,6 +78,9 @@ Type objective_function<Type>::operator() ()
     }
     if(presence[i]>0){
       Type mu_i = eta_density(gf[i],time[i]) + mu[time[i]] - .5*pow(sd_nugget[time[i]], 2);
+      if (beta.size() > 0) {
+        mu_i += mu_extra[i];
+      }
       Type sd_i = sd_nugget[time[i]];
       ans -= dnorm(log(response[i]), mu_i, sd_i, true);
       SIMULATE {
