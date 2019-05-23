@@ -49,7 +49,8 @@ data <- list(
     sweptArea = d[[2]]$sweptArea,
     gridCellArea = gridCellArea,
     yearLevels = as.numeric(levels(d$Year)),
-    reportLog = 0 ## Natural scale (faster)
+    reportLog = 0, ## Natural scale (faster)
+    X = d[[2]]$X
 )
 
 ## Parameters
@@ -60,7 +61,8 @@ parameters <- list(
     logscale=matrix(0,nlevels(time),2),
     logsd_nugget=rep(0,nlevels(time)),
     mu=rep(0,nlevels(time)),
-    calib=c(0,0)
+    calib=c(0,0),
+    beta=rep(0, ncol(data$X))
 )
 
 
