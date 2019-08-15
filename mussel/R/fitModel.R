@@ -94,7 +94,7 @@ obj3 <- MakeADFun(data=data,
                   DLL="mussel",
                   map=map3
                   )
-obj3$par <- structure(c(-7.5724043055008, -4.46731216093986, 0.207982042852333,  0.907872821912759, 0.278968517094824, 0, 0), .Names = c("logdelta",  "logdelta", "logscale", "logscale", "logsd_nugget","calib","calib"))
+obj3$par[1:7] <- structure(c(-7.5724043055008, -4.46731216093986, 0.207982042852333,  0.907872821912759, 0.278968517094824, 0, 0), .Names = c("logdelta",  "logdelta", "logscale", "logscale", "logsd_nugget","calib","calib"))
 system.time(opt3 <- nlminb(obj3$par,obj3$fn,obj3$gr,control=list(trace=1)))
 hessian <- optimHess(opt3$par, obj3$fn, obj3$gr)
 eigen(hessian)$val
