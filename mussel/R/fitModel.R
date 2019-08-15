@@ -88,7 +88,8 @@ map3$logsd_nugget<- factor(parameters$logsd_nugget* 0)
 obj3 <- MakeADFun(data=data,
                   parameters=parameters,
                   random=c("^eta"),
-                  profile="mu",
+                  ##profile=c("mu","beta"),
+                  profile=c("mu"),
                   regexp=TRUE,
                   DLL="mussel",
                   map=map3
