@@ -67,7 +67,10 @@ Type objective_function<Type>::operator() ()
   SIMULATE {
     SEPARABLE(VECSCALE(nldens_time,scale1),nldens1).simulate(eta_density);
   }
-  
+
+  /* Get mu for each observation */
+  vector<Type> muvec(nhaul);
+  muvec.setZero();
   /* Data for presence */
   array<Type> prob(eta_presence.dim);
   prob=Type(1)/(Type(1)+exp(Type(-1)*eta_presence));
@@ -81,6 +84,7 @@ Type objective_function<Type>::operator() ()
       if (beta.size() > 0) {
         mu_i += mu_extra[i];
       }
+      muvec(i) = mu_i;
       Type sd_i = sd_nugget[time[i]];
       ans -= dnorm(log(response[i]), mu_i, sd_i, true);
       SIMULATE {
@@ -92,6 +96,8 @@ Type objective_function<Type>::operator() ()
       }
     }
   }
+
+  REPORT(muvec);
 
   /* Report simulated data */
   SIMULATE {
