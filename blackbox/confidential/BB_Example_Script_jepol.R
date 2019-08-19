@@ -16,10 +16,6 @@ library(dplyr)
 dat <- lapply(dir(pattern="Polygons2"), readRDS)
 Years <- 2012:2018
 names(dat) <- Years
-
-plot(table(substring((dat[[7]]$date),6,7)))
-points(table(d$Month),col="red")
-
 #Subset data
 ##dat2 <- dat[dat$date %in% as.Date(c("2018-03-12", "2018-03-13")),]
 
@@ -28,14 +24,20 @@ points(table(d$Month),col="red")
 ##pts <- data.table("Site.ID."=1:2, y=c(56.759921, 56.791358), x=c(8.845, 8.887))
 
 library(DATRAS)
-load("../../d.RData")
-d <- subset(d, Year %in% 2014:2018) ## Removing year 2012 and 2013
+load("../../d_2019.RData")
+## Space time subset:
+d <- subset(d, Year %in% 2014:2019) ## Removing year 2012 and 2013
+d <- subset(d,lon<9.5 & lat>56)
+d <- subset(d, HaulVal == "V")
+d <- subset(d, Gear %in% c("MSK", "MSKOES") )
 
-f <- function(i, lag=0) {
+plot(table(substring((dat[[7]]$date),6,7)))
+points(table(d$Month),col="red")
+
+f <- function(i, lag) {
     print(i)
     lon <- d$lon[i]
     lat <- d$lat[i]
-    k <- which( d$Year[i] == Years )
     pts <- data.table(x=lon, y=lat)
     pts <- pts %>% 
         sf::st_as_sf(coords = c("x","y")) %>% 
@@ -45,19 +47,20 @@ f <- function(i, lag=0) {
     ##Make buffer 50 m around each points
     buf <- st_buffer(pts, 50)
     ## Which commercial year to consider
-    j <- k - lag
+    Year.survey <- as.numeric(as.character(d$Year[i]))
+    j <- which( Year.survey - lag  ==  Years)
     sum(st_area(st_intersection(dat[[j]], buf)))
 }
 
-f(2)
+f(2, lag=1)
 library(parallel)
 options(mc.cores=4)
 ##system.time(m <- mclapply(1:4, f))
 
 ## lag 0
-system.time(lag0 <- mclapply(1:length(d), f, lag=0)) ## 18 minutes
-lag0 <- unlist(lag0)
-save(lag0, file="lag0.RData")
+## system.time(lag0 <- mclapply(1:length(d), f, lag=0)) ## 18 minutes
+## lag0 <- unlist(lag0)
+## save(lag0, file="lag0.RData")
 
 ## lag 1
 system.time(lag1 <- mclapply(1:length(d), f, lag=1)) ## 18 minutes
@@ -69,6 +72,12 @@ system.time(lag2 <- mclapply(1:length(d), f, lag=2)) ## 18 minutes
 lag2 <- unlist(lag2)
 save(lag2, file="lag2.RData")
 
+## Add to 'd'
+if (FALSE) {
+    d$lag1 <- lag1 / (pi*50^2)
+    d$lag2 <- lag2 / (pi*50^2)
+    save(d, file="d_lag.RData")
+}
 
 
 pts <- data.table("haul.id"=levels(d$haul.id), x=d$lon, y=d$lat)
