@@ -100,9 +100,11 @@ plot(factor(d$lag1[i]!=0),resid[i])
 sdr <- sdreport(env$obj3)
 
 
-d[[2]]$X <- cbind(d$lag1,d$lag2)
+d$Weight <- d$WeightLarge
+d[[2]]$X <- model.matrix(~poly(lag1,2)*poly(lag2,2),data=d[[2]])
+d[[2]]$X <- d[[2]]$X[,-1]
 env <- fitModel(d,FALSE,FALSE,FALSE)
-sdr <- sdreport(env$obj3)
+sdr <- sdreport(env$obj3,hessian=env$hessian)
 ## beta          0.08783800 0.08893661
 ## beta          0.01808333 0.10154617
 
@@ -128,19 +130,6 @@ sdr <- sdreport(env$obj3)
 ## NaN
 
 
-##################### SIMPLE
-d$flag1 <- cut(d$lag1, breaks=c(-1,0,100))
-d$flag2 <- cut(d$lag2, breaks=c(-1,0,100))
-
-d$Weight <- d$WeightSmall
-d[[2]]$X <- model.matrix(~flag1:flag2-1,data=d[[2]])[,-1]
-env <- fitModel(d,FALSE,FALSE,FALSE)
-sdrSmall <- sdreport(env$obj3)
-## ==== RECRUITMENT
-## beta          0.88310599 0.33502158  (lag1 && !lag2)
-## beta          0.11997373 0.36829246  (lag2 && !lag1)
-## beta          0.94340745 0.36855030  (lag1 &&  lag2)
-
 d$Weight <- d$WeightLarge
 d[[2]]$X <- model.matrix(~flag1:flag2-1,data=d[[2]])[,-1]
 env <- fitModel(d,FALSE,FALSE,FALSE)
@@ -151,8 +140,42 @@ sdrLarge <- sdreport(env$obj3)
 ## beta          1.27682386 0.17117546
 
 
+##################### FOR REPORT
+
+##################### SIMPLE
+d$flag1 <- factor(d$lag1>0)
+d$flag2 <- factor(d$lag2>0)
+
+d$Weight <- d$WeightSmall
+d[[2]]$X <- model.matrix(~flag1:flag2-1,data=d[[2]])[,-1]
+env <- fitModel(d,FALSE,FALSE,FALSE)
+sdrSmall <- sdreport(env$obj3,hessian=env$hessian)
+d[[2]]$X <- model.matrix(~flag1-1,data=d[[2]])[,-1,drop=FALSE]
+env2 <- fitModel(d,FALSE,FALSE,FALSE)
+sdrSmall <- sdreport(env$obj3,hessian=env$hessian)
+1-pchisq(2*(env2$opt3$objective-env$opt3$objective), df=3)
+sdrSmall2 <- sdreport(env2$obj3,hessian=env2$hessian)
+## ==== RECRUITMENT
+## beta          0.88310599 0.33502158  (lag1 && !lag2)
+## beta          0.11997373 0.36829246  (lag2 && !lag1)
+## beta          0.94340745 0.36855030  (lag1 &&  lag2)
+
+## Model without effects
+d[[2]]$X <- matrix(,length(d),0)
+env3 <- fitModel(d,FALSE,FALSE,FALSE)
+resid <- log(env3$data$response)-env3$rep$muvec
+i <- is.finite(resid)
+plot(log(d$lag1[i]),resid[i])
+plot(d$lag2[i],resid[i],log="x")
+save(resid,file="resid.RData")
+
 #############################################################
 ## 5. Save results
 #############################################################
+
+## d[[2]]$X <- model.matrix(~flag2-1,data=d[[2]])[,-1,drop=FALSE]
+## env4 <- fitModel(d,FALSE,FALSE,FALSE)
+## sdrSmall4 <- sdreport(env4$obj3,hessian=env4$hessian)
+
 
 save.image("res.RData.exe") ## .exe == don't check in :)
