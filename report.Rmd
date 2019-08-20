@@ -1,0 +1,79 @@
+# Undersøgelse af fiskeriets påvirkning af muslingerekrutering
+
+Det skal undersøges om det kommercielle fiskeri påvirker bundfaunaen i en grad så det kan detekteres i de efterfølgende års muslingerekrutering. For at besvare dette spørgsmål benyttes den allerede udviklede muslingebestandsmodel som er baseret på survey data. Til modellen tilføjes et sæt af nye forklarende variable til at beskrive mængden af kommerciel fiskeriaktivitet hhv et år og to år forud for et givent survey år. Mere præcist, hvis (year,lon,lat) betegner tid og sted for et survey skrab, så beregnes, baseret på 'blackbox data', det samlede fiskede areal indenfor en 50 meter cirkel omkring (lon,lat) for hhv årende year-1 og year-2 (bemærk at arealer som skrabes flere gange tælles med hver gang). Vi dividerer med cirklens samlede areal og opnår de dimensionsløse forklarende variable 'lag1' og 'lag2' som beskriver graden af fiskeriaktivitet de to foregående år.
+
+```
+> summary(lag1)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  0.0000  0.1535  0.0000 17.9303 
+> summary(lag2)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+ 0.0000  0.0000  0.0000  0.1654  0.0000 18.3374 
+```
+
+Det ses at lag1 og lag2 er nul for de fleste skrab i surveyet, dvs. der har ikke været nogen fiskeri påvirkning indenfor de sidste to år. Den maksimale værdi på ca. 18 af f.eks. lag1 betyder at der for visse survey skrab er blevet fisket 18 gange i gennemsnit per arealenhed i det forrige år.
+
+I sin eksisterende form beskriver muslingemodellen den forventede fangst i et givet punkt til et givet tidspunkt:
+
+\[\log E[C] = u(t) + u(x,t)\]
+
+Her betegner $u(t)$ en årseffekt og $u(x,t)$ et rum-tids residual.
+Model udvidelsen består i at inludere lag1 og lag2 i denne formel. 
+
+\[\log E[C] = u(t) + u(x,t) + f(lag1,lag2)\]
+
+Fremfor at beskrive den totale fangst, er vi her primært interesserede i rekrutering. Vi sætter derfor en øvre grænse på 4.5cm til at definere små individer. 'C' betegner altså fangsten af individer i intervallet [0,4.5] i ovenstående ligning.
+
+Der benyttes blackbox data for perioden 2012-2018. Da der for hvert survey år skal bruges blackbox data fra de to forrige år, er vi indskrænket til survey data for perioden 2014-2019.
+
+Analysen udføres i to dele.
+
+1. I første del benyttes kun 0/1-information altså om der har været fiskeri eller ej.
+2. I anden del fittes modellen uden lag1 og lag2 og residualer plottes mod de to variable for at se efter funktionel sammenhæng.
+
+## Resultater del 1
+
+\[\log E[C] = u(t) + u(x,t) + \beta_1 * (lag1>0\:\&\:lag2=0) + \beta_2 * (lag1=0\:\&\:lag2>0) + \beta_3 * (lag1>0\:\&\:lag2>0) \]
+
+
+```
+                 Estimate Std. Error
+beta1          0.88310599 0.33502158  (lag1>0 & lag2=0)
+beta2          0.11997373 0.36829246  (lag1=0 & lag2>0)
+beta3          0.94340745 0.36855030  (lag1>0 & lag2>0)
+```
+
+Vi ser at kun $\beta_1$ og $\beta_3$ er signifikante og de to estimater er næsten ens. Modellen kan reduceres til (p=0.94)
+
+\[\log E[C] = u(t) + u(x,t) + \beta * (lag1>0) \]
+
+med estimatet
+
+```
+                Estimate Std. Error
+beta          0.88940044 0.25943525  (lag1>0)
+```
+
+Det betyder at lag1 er vigtigste forklarende variabel. Estimatet udtrykker at den forventede fangst er $exp(0.88)=2.4$ gange så høj hvis der har været fisket året før.
+
+## Resultater del 2
+
+Her køres modellen uden forklarende variable og residualer plottes mod de forklarende variable:
+
+```{r fig=TRUE, echo=FALSE}
+load("resid.RData")
+load("blackbox/confidential/d_lag.RData")
+lag1 <- d[[2]]$lag1
+lag2 <- d[[2]]$lag2
+layout(t(1:2))
+plot(log(lag1),resid)
+plot(log(lag2),resid)
+```
+
+Der er ikke nogen oplagt sammenhæng.
+
+## Konklusion
+
+Der er ret stærk sammenhæng mellem fangsten af små individer (<4.5cm) et givet år og tilstædeværelsen af fiskeri det forrige år. Det lader til at det er *tilstædeværelsen* af fiskeri som har betydning og ikke *mængden* af fiskeri. Tilstedeværelsen af fiskeri to år tilbage har ingen betydning.
+
+Det skal understreges at ovenstående ikke beviser en årsagssammenhæng i form af at tilstædeværelsen af fiskeri fører til højere rekrutering. Hvis fiskerne generelt søger hen hvor muslingetætheden er høj og hvis der samtidigt er en årlig sammenhæng i muslingetæthederne, så vil det kunne forklare resultaterne.
