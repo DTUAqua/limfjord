@@ -5,7 +5,7 @@ Version: 1.0
 Date: 2017-03-06
 Author: Kasper Kristensen
 Maintainer: Kasper Kristensen <kaskr@dtu.dk>
-Description: More about what it does (maybe more than one line)
+Description: Fit spatial mussel model and calculate are specific abundance indices.
 License: What license is it under?
 LinkingTo: TMB, RcppEigen
 Depends: gridConstruct, DATRAS, TMB
