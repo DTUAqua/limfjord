@@ -9,3 +9,4 @@ Description: Fit spatial mussel model and calculate are specific abundance indic
 License: What license is it under?
 LinkingTo: TMB, RcppEigen
 Depends: gridConstruct, DATRAS, TMB
+SystemRequirements: C++11
