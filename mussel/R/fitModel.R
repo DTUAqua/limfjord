@@ -135,7 +135,7 @@ if(getLogB) {
     ## obj3$env$data$spatialRegions <-
     ##     unclass(factor(seq_len(nrow(gr))))-1
     ## storage.mode(obj3$env$data$spatialRegions) <- "double"
-    obj3$env$data$regionIndicator <- as(.symDiagonal(nrow(gr)), "dgTMatrix")
+    obj3$env$data$regionIndicator <- as(as(.symDiagonal(nrow(gr)), "generalMatrix"), "TsparseMatrix")
     if(FALSE) { ## Old version without bias correction
         obj3$env$data$reportLog <- 1
         ##obj3$retape()
