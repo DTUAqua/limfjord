@@ -19,16 +19,16 @@ gridConstruct <- function(d, km=.5){
     ## Read shape file data
     ## Depth data:
     ##  shape <- readOGR("../shpfiles/","Bathy_Lim_1m_ploy")
-    file <- system.file("shp/Denmark",package="mussel")
-    shape <- readOGR(file,"Kystlinie")
-    proj4 <- proj4string(shape)
-    map <- spTransform(shape,CRS("+proj=longlat"))
+    file <- system.file("shp/Denmark/Kystlinie.shp",package="mussel")
+    shape <- as(sf::st_read(file), "Spatial")
+    proj4 <- sp::proj4string(shape)
+    map <- sp::spTransform(shape, sp::CRS("+proj=longlat"))
     gr2 <- as.data.frame(gr)
-    coordinates(gr2) <- ~lon + lat
-    proj4string(gr2) <- CRS("+proj=longlat")
-    xtra <- over(gr2, map)
+    sp::coordinates(gr2) <- ~lon + lat
+    sp::proj4string(gr2) <- sp::CRS("+proj=longlat")
+    xtra <- sp::over(gr2, map)
     gr3 <- gr[is.na(xtra$ID),]
-    cc <- connectedComponents(gr3)
+    cc <- gridConstruct::connectedComponents(gr3)
     gr3 <- gr3[cc[[which.max(sapply(cc,length))]],]
     while(any(rowSums(attr(gr3,"pattern")) <=2 ) ){
         gr3 <- gr3[rowSums(attr(gr3,"pattern"))>2,]
