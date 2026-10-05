@@ -56,14 +56,13 @@ gridConstruct <- function(d, km=.5){
     lookupRegions <- function(filename = "Limfjord_omraader_nov_2005_area",
                               getShape=FALSE) {
         folder <- system.file("shp/Regions",package="mussel")
-        shape <- readOGR(folder, filename)
-        proj4 <- proj4string(shape)
-        regions <- spTransform(shape,CRS("+proj=longlat"))
+        shape <- as(sf::st_read(paste0(folder,"/",filename,".shp")), "Spatial")
+        regions <- sp::spTransform(shape, sp::CRS("+proj=longlat"))
         if(getShape)return(regions)
         gr2 <- as.data.frame(gr3)
-        coordinates(gr2) <- ~lon + lat
-        proj4string(gr2) <- CRS("+proj=longlat")
-        xtra <- over(gr2, regions)
+        sp::coordinates(gr2) <- ~lon + lat
+        sp::proj4string(gr2) <- sp::CRS("+proj=longlat")
+        xtra <- sp::over(gr2, regions)
         fac <- factor(xtra[[2]])
         fac
     }
