@@ -53,6 +53,7 @@ gridConstruct <- function(d, km=.5){
     ## Natura2000 = Habitatomraade16_intersect_hav
     ## Habitatomraade30_Intersect_hav_explode_kun_lovns
     ## Limfjord_omraader_nov_2005_area
+    ## Bestandsmodel_BMS_LF
     lookupRegions <- function(filename = "Limfjord_omraader_nov_2005_area",
                               getShape=FALSE) {
         folder <- system.file("shp/Regions",package="mussel")
@@ -85,8 +86,9 @@ gridConstruct <- function(d, km=.5){
 
     shp_natura2000 <<- lookupRegions("Habitatomraade16_intersect_hav",TRUE)
     shp_lovns <<- lookupRegions("Habitatomraade30_Intersect_hav_explode_kun_lovns",TRUE)
-    shp_prod <<- lookupRegions("Alle_muslingeomraader_2011_region",TRUE)
+    shp_prod_old <<- lookupRegions("Alle_muslingeomraader_2011_region",TRUE)
     shp_forbud <<- lookupRegions("Forbudsomraader_musling",TRUE)
+    shp_prod <<- lookupRegions("Bestandsmodel_BMS_LF", TRUE)
     fac <- lookupRegions()
     remap <- c("Lovns Bredning, Øst", "Lovns Bredning, Vest")
     levels(fac)[levels(fac) %in% remap] <- "Lovns Bredning"
