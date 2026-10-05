@@ -132,7 +132,7 @@ plotRegions <- function(...) {
     plot(shp_forbud, add=TRUE, density=20)
     omr <- c("32", "33", "34", "36", "37", "38", "39")
     for(x in omr) {
-        sub <- subset(shp_prod, OMRådENUMM == x)
+        sub <- subset(shp_prod, OMRådENUM == x)
         plot(sub, add=TRUE, ...)
         co <- coordinates(sub)
         text(co[1], co[2], x, font=2)
