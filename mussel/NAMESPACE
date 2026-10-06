@@ -1,3 +1,4 @@
 importFrom(sp, plot)
+importFrom(Matrix, t, colSums)
 exportPattern("^[[:alpha:]]+")
 useDynLib(mussel)
