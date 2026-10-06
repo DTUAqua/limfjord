@@ -110,10 +110,12 @@ spatialRegionIndicator <- function(gr) {
     data(shp, package="mussel")
     lovns <- as.numeric(!is.na(lookupShape(gr, shp_lovns)[[1]]))
     natura2000 <- as.numeric(!is.na(lookupShape(gr, shp_natura2000)[[1]]))
-    prodomr <- factor(lookupShape(gr, shp_prod)[[1]], exclude=NULL)
+    prodomr <- factor(lookupShape(gr, shp_prod)[["OMRådENUM"]], exclude=NULL)
     A <- sparse.model.matrix( ~ prodomr + natura2000 + lovns - 1   )
     colnames(A)[colnames(A) == "lovns"] <- "Lovns Bredning"
     colnames(A)[colnames(A) == "natura2000"] <- "Natura Loegstoer"
+    A <- A[, colnames(A) != "prodomrNA"]
+    A <- cbind(prodomrALL = prodomr %in% 5:37, A)
     A
 }
 
