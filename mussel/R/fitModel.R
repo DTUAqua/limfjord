@@ -83,7 +83,8 @@ parameters <- list(
 map3 <- list()
 map3$logscale <- factor(col(parameters$logscale))
 map3$logsd_nugget<- factor(parameters$logsd_nugget* 0)
-obj3 <- RTMB::MakeADFun(cmb(tpl, data),##data=data,
+func <- cmb(tpl, data)
+obj3 <- RTMB::MakeADFun(func,
                   parameters=parameters,
                   random=c("^eta"),
                   profile="mu",
@@ -99,6 +100,9 @@ eigen(hessian)$val
 lpb <- obj3$env$last.par.best
 pl <- obj3$env$parList(par=lpb)
 rep <- obj3$report(lpb)
+
+## To change the data = 'd'
+dataenv <- environment(func)
 
 if(getIndex){
     cat("Calc index spatialRegions\n")
@@ -123,7 +127,7 @@ if(getIndex){
 }
 
 if(getLogIndex){
-    obj3$env$data$reportLog <- 1 ## Log scale report
+    dataenv$d$reportLog <- 1 ## Log scale report
     system.time( sdrep <- sdreport(obj3, hessian = hessian, bias.correct=TRUE,
                                    getReportCovariance=FALSE,
                                    bias.correct.control=list(sd=FALSE, nsplit=10) ) ) ## <--- very memory intensive when reportLog = TRUE
@@ -135,7 +139,7 @@ if(getLogB) {
     ## obj3$env$data$spatialRegions <-
     ##     unclass(factor(seq_len(nrow(gr))))-1
     ## storage.mode(obj3$env$data$spatialRegions) <- "double"
-    obj3$env$data$regionIndicator <- as(as(.symDiagonal(nrow(gr)), "generalMatrix"), "TsparseMatrix")
+    dataenv$d$regionIndicator <- as(as(.symDiagonal(nrow(gr)), "generalMatrix"), "TsparseMatrix")
     if(FALSE) { ## Old version without bias correction
         obj3$env$data$reportLog <- 1
         ##obj3$retape()
