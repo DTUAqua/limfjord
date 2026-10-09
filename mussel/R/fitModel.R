@@ -102,7 +102,7 @@ rep <- obj3$report(lpb)
 
 if(getIndex){
     cat("Calc index spatialRegions\n")
-    system.time( sdrep0 <- sdreport(obj3, hessian = hessian, bias.correct=TRUE) )
+    system.time( sdrep0 <- sdreport(obj3, hessian = hessian, bias.correct=TRUE, getReportCovariance=FALSE) )
 
     ## cat("Calc index spatialRegions2\n")
     ## levels(spatialRegions2) <- c(levels(spatialRegions2), "NA")
