@@ -247,11 +247,12 @@ plotTimeSeriesLog <- function(env,selectRegions = c("Thisted Bredning, Sydvest",
 
 plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),
                            unit=c("kilotons", "tons", "kg/m^2"),
-                           threshold=1,...) {
+                           threshold=1,doplot=TRUE,...) {
     unit <- match.arg(unit)
     env$unit <- unit
     env$selectRegions <- selectRegion
     env$threshold <- threshold
+    env$doplot <- doplot
     local({
         est <- sdrep0$unbiased$value
         sd <- summary(sdrep0,"report")[,2]
@@ -272,13 +273,14 @@ plotTimeSeries <- function(env, selectRegion = c("Lovns Bredning"),
         A <- gridCellArea * 1e6 * numCells
 
         multiplier <- c("kilotons"= A * 1e-6, "tons"= A * 1e-3, "kg/m^2"=1)[unit]
+        if (doplot) {
         matplot(as.numeric(rownames(newmat)),newmat*multiplier,type="l", col=1, lty=c(1,2,2), xlab="", ylab="", las=1, ylim=c(0,max(newmat*multiplier)))
         xlab <- "Year"
         ylab <- eval(parse(text=paste0("expression(`Biomasse `(",unit,"))"))[[1]])
         mtext(ylab,2,line=2.5)
         mtext(xlab,1,line=2.5)
         title(selectRegions)
-
+        }
         Bsubset <- exp(logB[as.logical(regionIndicator[, selectRegions]), ])
         Bsubset <- Bsubset[, -1] ## Remove first year (2004)
         Bsubset[Bsubset < threshold] <- NA

@@ -1,0 +1,99 @@
+---
+title: "Model output"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Model output}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE, message=FALSE}
+knitr::opts_chunk$set(fig.width=6,fig.height=6,echo=FALSE)
+library(mussel)
+library(gridConstruct)
+data(grid, package="mussel") ## Get default grid
+load("env.RData")
+animYears <- 2006:latestYear
+## From stockassessment.org
+xtab <- function(tab,...) {
+  rownames(tab) <- paste0("**",rownames(tab),"**")
+  dec <- c(2,2,2,0,0,0,2)
+  tab <- t(round(t(tab),dec))
+  knitr::kable(tab,...)
+}
+xanim <- function(area) {
+  k <- which(as.logical(env$regionIndicator[, area]))
+  for(i in animYears) plotBiomassMap(env, time=i, xlim=range(gr$lon[k]), ylim=range(gr$lat[k]))
+}
+```
+
+# By area
+
+## Natura Loegstoer
+
+```{r}
+tab1 <- plotTimeSeries(env,"Natura Loegstoer")
+```
+
+```{r, results='asis'}
+xtab(tab1, caption="Natura Loegstoer")
+```
+
+```{r, fig.show='animate'}
+xanim("Natura Loegstoer")
+```
+
+## Lovns Bredning
+
+```{r}
+tab1 <- plotTimeSeries(env,"Lovns Bredning")
+```
+
+```{r, results='asis'}
+xtab(tab1, caption="Lovns Bredning")
+```
+
+```{r, fig.show='animate'}
+xanim("Lovns Bredning")
+```
+
+## Prodomr 5-37
+
+```{r}
+tab1 <- plotTimeSeries(env,"prodomrALL")
+```
+
+```{r, results='asis'}
+xtab(tab1, caption="prodomrALL")
+```
+
+```{r, fig.show='animate'}
+xanim("prodomrALL")
+```
+
+# Prodomr table
+
+```{r, results='asis'}
+nm <- colnames(env$regionIndicator)
+lst <- lapply(nm, function(x) plotTimeSeries(env,x, doplot=FALSE)[latestYear,,drop=FALSE] )
+tab1 <- do.call("rbind",lst)
+rownames(tab1) <- nm
+xtab(tab1, caption=latestYear)
+```
+
+# Appendix
+
+## Gear calibration
+
+```{r}
+invisible(plotCalib())
+invisible(plotCalib("efficiency"))
+```
+
+## Data overview
+
+```{r}
+print(d)
+```

@@ -1,15 +1,19 @@
-## Script for stockassessment.org
-.libPaths(".")
-devtools:::install_github("kaskr/gridConstruct/gridConstruct")
-devtools:::install_github("DTUAqua/limfjord/mussel")
-
-## Load packages and data
+## Load packages
 library(DATRAS)
 library(mussel)
-d <- readExchange("data.zip")
+
+## Read data
+d <- readICES("dat/ALL_MUS_2006-2026_020926.csv")
+## OR: d <- readExchange("data/data.zip")
 
 ## Remove invalid hauls (I/V)
 d <- subset(d, HaulVal == "V")
+
+## Select Gear codes
+d <- subset(d, Gear %in% c("MSK", "MSKOES"))
+
+## Select Species = "Mytilus edulis" (not yet in DATRAS Worms table)
+d <- subset(d, SpecCode==140480)
 
 ## Space time subset:
 d <- subset(d,lon<9.5 & lat>56)
@@ -17,7 +21,7 @@ latestYear <- max(levels(d$Year))
 d <- subset(d, Year %in% 2004:as.numeric(latestYear))
 
 ## Add swept area in m^2 to dataset:
-Width <- c("MSK" = 1.20, "MSKOES" = 1.00) ## FIXME: New gear 1.00 width ?
+Width <- c("MSK" = 1.00, "MSKOES" = 0.96) ## FIXME: New gear 1.00 width ?
 d$sweptArea <- d$Distance * Width[as.character(d$Gear)]
 
 ## Add response variable: Total weight (g)
@@ -28,6 +32,9 @@ d[["HH"]]$Weight <- w[as.character(d$haul.id)]
 ## Standardize response to kg/m^2
 d[["HH"]]$Weight <- d[["HH"]]$Weight / d[["HH"]]$sweptArea
 d$sweptArea[] <- 1
+
+## Print DATRASraw
+print(d)
 
 #############################################################
 ## 3. Add spatial grid
@@ -45,4 +52,4 @@ env <- fitModel(d)
 ## 5. Save results
 #############################################################
 
-save.image("res.RData.exe") ## .exe == don't check in :)
+save.image(file="env.RData")
